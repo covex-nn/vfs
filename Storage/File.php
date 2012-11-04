@@ -1,10 +1,11 @@
 <?php
 
-  /**
-   * @package JooS
-   */
+/**
+ * @package JooS
+ */
+require_once "JooS/Stream/Storage.php";
 
-  require_once "JooS/Stream/Storage.php";
-  
-  final class JooS_Stream_Storage_File extends JooS_Stream_Storage {
-  }
+final class JooS_Stream_Storage_File extends JooS_Stream_Storage
+{
+    
+}

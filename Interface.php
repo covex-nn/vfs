@@ -1,13 +1,15 @@
 <?php
 
-  /**
-   * An instance of this class is initialized as soon as a stream
-   * function tries to access the protocol it is associated with.
-   *
-   * @package JooS
-   * @link http://www.php.net/manual/en/class.streamwrapper.php
-   */
-  interface JooS_Stream_Interface {
+/**
+ * An instance of this class is initialized as soon as a stream
+ * function tries to access the protocol it is associated with.
+ *
+ * @package JooS
+ * @link http://www.php.net/manual/en/class.streamwrapper.php
+ */
+interface JooS_Stream_Interface
+{
+
     /**
      * Constructs a new stream wrapper
      * 
@@ -269,4 +271,5 @@
      * @return array
      */
     public function url_stat($path, $flags);
-  }
+
+}

@@ -84,14 +84,14 @@ interface JooS_Stream_Interface
      *
      * This method is called in response to rename().
      *
-     * Should attempt to rename path_from to path_to
+     * Should attempt to rename pathFrom to pathTo
      *
      * @link http://www.php.net/manual/en/streamwrapper.rename.php
-     * @param string $path_from
-     * @param string $path_to
+     * @param string $pathFrom
+     * @param string $pathTo
      * @return bool
      */
-    public function rename($path_from, $path_to);
+    public function rename($pathFrom, $pathTo);
 
     /**
      * Removes a directory
@@ -111,10 +111,10 @@ interface JooS_Stream_Interface
      * This method is called in response to stream_select(). 
      *
      * @link http://www.php.net/manual/en/streamwrapper.stream-cast.php
-     * @param int $cast_as
+     * @param int $castAs
      * @return resource
      */
-    public function stream_cast($cast_as);
+    public function stream_cast($castAs);
 
     /**
      * Close an resource
@@ -171,10 +171,10 @@ interface JooS_Stream_Interface
      * @param string $path
      * @param string $mode
      * @param int $options
-     * @param string &$opened_path
+     * @param string $openedPath
      * @return bool
      */
-    public function stream_open($path, $mode, $options, &$opened_path);
+    public function stream_open($path, $mode, $options, &$openedPath);
 
     /**
      * Read from stream
@@ -212,11 +212,11 @@ interface JooS_Stream_Interface
      *
      * @link http://www.php.net/manual/en/streamwrapper.stream-set-option.php
      * @param int $option
-     * @param int $arg1
-     * @param int $arg2
+     * @param int $argOne
+     * @param int $argTwo
      * @return bool
      */
-    public function stream_set_option($option, $arg1, $arg2);
+    public function stream_set_option($option, $argOne, $argTwo);
 
     /**
      * Retrieve information about a file resource

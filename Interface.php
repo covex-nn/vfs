@@ -13,7 +13,8 @@ interface JooS_Stream_Interface
     /**
      * Constructs a new stream wrapper
      * 
-     * Called when opening the stream wrapper, right before stream::stream_open().
+     * Called when opening the stream wrapper,
+     * right before stream::stream_open().
      * 
      * @link http://www.php.net/manual/en/streamwrapper.construct.php
      */
@@ -23,7 +24,8 @@ interface JooS_Stream_Interface
      * Close directory handle
      *
      * This method is called in response to closedir().
-     * Any resources which were locked, or allocated, during opening and use of the directory stream should be released.
+     * Any resources which were locked, or allocated, during opening and use of
+     * the directory stream should be released.
      *
      * @link http://www.php.net/manual/en/streamwrapper.dir-closedir.php
      * @return bool
@@ -121,7 +123,8 @@ interface JooS_Stream_Interface
      *
      * This method is called in response to fclose().
      *
-     * All resources that were locked, or allocated, by the wrapper should be released.
+     * All resources that were locked, or allocated, by the wrapper
+     * should be released.
      *
      * @link http://www.php.net/manual/en/streamwrapper.stream-close.php
      */
@@ -142,7 +145,8 @@ interface JooS_Stream_Interface
      * 
      * This method is called in response to fflush().
      *
-     * If you have cached data in your stream but not yet stored it into the underlying storage, you should do so now.
+     * If you have cached data in your stream but not yet stored it into the
+     * underlying storage, you should do so now.
      *
      * @link http://www.php.net/manual/en/streamwrapper.stream-flush.php
      * @return bool
@@ -153,7 +157,8 @@ interface JooS_Stream_Interface
      * Advisory file locking
      *
      * This method is called in response to flock(), when file_put_contents()
-     * (when flags contains LOCK_EX), stream_set_blocking() and when closing the stream (LOCK_UN).
+     * (when flags contains LOCK_EX), stream_set_blocking() and when closing
+     * the stream (LOCK_UN).
      *
      * @link http://www.php.net/manual/en/streamwrapper.stream-lock.php
      * @param mode $operation
@@ -192,7 +197,8 @@ interface JooS_Stream_Interface
      * 
      * This method is called in response to fseek().
      *
-     * The read/write position of the stream should be updated according to the offset and whence.
+     * The read/write position of the stream should be updated according to
+     * the offset and whence.
      *
      * @link http://www.php.net/manual/en/streamwrapper.stream-seek.php
      * @param int $offset

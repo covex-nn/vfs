@@ -7,7 +7,8 @@
 /**
  * List of stream entities.
  */
-final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, ArrayAccess
+final class JooS_Stream_Storage_List
+  implements IteratorAggregate, Countable, ArrayAccess
 {
 
   /**

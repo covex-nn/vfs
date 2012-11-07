@@ -8,7 +8,8 @@ require_once "JooS/Stream/Storage.php";
 /**
  * Directory.
  */
-final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage implements IteratorAggregate, Countable
+final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage
+  implements IteratorAggregate, Countable
 {
 
   /**

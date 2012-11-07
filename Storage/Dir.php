@@ -41,7 +41,7 @@ final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage implements Itera
   /**
    * Sets file list.
    * 
-   * @param JooS_Stream_Storage_List $files 
+   * @param JooS_Stream_Storage_List $files Files
    * 
    * @return null
    */

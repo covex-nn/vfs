@@ -31,8 +31,8 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   /**
    * Creates new instance.
    * 
-   * @param JooS_Stream_Entity_Interface $content
-   * @param JooS_Stream_Storage_Dir $storage
+   * @param JooS_Stream_Entity_Interface $content Content
+   * @param JooS_Stream_Storage_Dir      $storage Storage
    * 
    * @return JooS_Stream_Storage
    */
@@ -95,7 +95,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   /**
    * Set name.
    * 
-   * @param string $name 
+   * @param string $name Name
    * 
    * @return null
    */
@@ -117,7 +117,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   /**
    * Sets parent storage.
    * 
-   * @param JooS_Stream_Storage_Dir $storage 
+   * @param JooS_Stream_Storage_Dir $storage Storage
    * 
    * @return null
    */
@@ -142,7 +142,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   /**
    * Sets entity.
    * 
-   * @param JooS_Stream_Entity_Interface $content 
+   * @param JooS_Stream_Entity_Interface $content Content
    * 
    * @return null
    */

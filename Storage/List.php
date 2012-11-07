@@ -46,7 +46,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Is item exists ?
    * 
-   * @param string $name
+   * @param string $name Name
    * 
    * @return boolean
    */
@@ -58,7 +58,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Returns item.
    * 
-   * @param string $name
+   * @param string $name Name
    *
    * @return JooS_Stream_Storage_Interface
    */
@@ -70,8 +70,8 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Set new item.
    * 
-   * @param string $name
-   * @param JooS_Stream_Storage_Interface $value
+   * @param string                        $name  Name
+   * @param JooS_Stream_Storage_Interface $value Storage
    * 
    * @return null
    */
@@ -87,7 +87,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Delete item.
    * 
-   * @param type $name
+   * @param type $name Name
    * 
    * @return null
    */
@@ -99,7 +99,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Is item exists ?
    * 
-   * @param string $offset
+   * @param string $offset Name
    * 
    * @return boolean
    */
@@ -111,7 +111,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Returns item.
    * 
-   * @param string $offset
+   * @param string $offset Name
    *
    * @return JooS_Stream_Storage_Interface
    */
@@ -123,8 +123,8 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Set new item.
    * 
-   * @param string $offset
-   * @param JooS_Stream_Storage_Interface $value
+   * @param string $offset                       Name
+   * @param JooS_Stream_Storage_Interface $value Value
    * 
    * @return null
    */
@@ -136,7 +136,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Delete item.
    * 
-   * @param type $offset
+   * @param type $offset Name
    * 
    * @return null
    */

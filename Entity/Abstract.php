@@ -24,7 +24,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   /**
    * Protected constructor.
    * 
-   * @param string $path
+   * @param string $path Path
    */
   protected function __construct($path)
   {
@@ -75,7 +75,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   /**
    * Sets path.
    * 
-   * @param string $path 
+   * @param string $path Path
    * 
    * @return null
    */
@@ -87,7 +87,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   /**
    * Sets virtual flag.
    * 
-   * @param boolean $virtual
+   * @param boolean $virtual Virtual
    * 
    * @return null
    */

@@ -39,8 +39,8 @@ interface JooS_Stream_Interface
    *
    * This method is called in response to opendir().
    * 
-   * @param string $path
-   * @param int $options
+   * @param string $path    Path
+   * @param int    $options Options
    * 
    * @link http://www.php.net/manual/en/streamwrapper.dir-opendir.php
    * @return boolean
@@ -76,9 +76,9 @@ interface JooS_Stream_Interface
    *
    * This method is called in response to mkdir().
    *
-   * @param string $path
-   * @param int $mode
-   * @param int $options
+   * @param string $path    Path
+   * @param int    $mode    Mode
+   * @param int    $options Options
    * 
    * @link http://www.php.net/manual/en/streamwrapper.mkdir.php
    * @return boolean
@@ -92,8 +92,8 @@ interface JooS_Stream_Interface
    *
    * Should attempt to rename pathFrom to pathTo
    *
-   * @param string $pathFrom
-   * @param string $pathTo
+   * @param string $pathFrom Path from
+   * @param string $pathTo   Path to
    * 
    * @link http://www.php.net/manual/en/streamwrapper.rename.php
    * @return boolean
@@ -105,8 +105,8 @@ interface JooS_Stream_Interface
    *
    * This method is called in response to rmdir().
    *
-   * @param string $path
-   * @param int $options
+   * @param string $path    Path
+   * @param int    $options Options
    * 
    * @link http://www.php.net/manual/en/streamwrapper.rmdir.php
    * @return boolean
@@ -118,7 +118,7 @@ interface JooS_Stream_Interface
    * 
    * This method is called in response to stream_select(). 
    * 
-   * @param int $castAs
+   * @param int $castAs Cast As
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-cast.php
    * @return resource
@@ -168,7 +168,7 @@ interface JooS_Stream_Interface
    * (when flags contains LOCK_EX), stream_set_blocking() and when closing
    * the stream (LOCK_UN).
    *
-   * @param mode $operation
+   * @param mode $operation Operation
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-lock.php
    * @return boolean
@@ -181,10 +181,10 @@ interface JooS_Stream_Interface
    * This method is called immediately after the wrapper is initialized
    * (f.e. by fopen() and file_get_contents()).
    *
-   * @param string $path
-   * @param string $mode
-   * @param int $options
-   * @param string &$openedPath
+   * @param string $path        Path
+   * @param string $mode        Mode
+   * @param int    $options     Options
+   * @param string &$openedPath Opened Path
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-open.php
    * @return boolean
@@ -196,7 +196,7 @@ interface JooS_Stream_Interface
    * 
    * This method is called in response to fread() and fgets().
    *
-   * @param int $count
+   * @param int $count Count
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-read.php
    * @return string
@@ -211,7 +211,7 @@ interface JooS_Stream_Interface
    * The read/write position of the stream should be updated according to
    * the offset and whence.
    *
-   * @param int $offset
+   * @param int $offset Offset
    * @param int $whence = SEEK_SET
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-seek.php
@@ -228,9 +228,9 @@ interface JooS_Stream_Interface
    * SEEK_CUR - Set position to current location plus offset.
    * SEEK_END - Set position to end-of-file plus offset.
    *
-   * @param int $option
-   * @param int $argOne
-   * @param int $argTwo
+   * @param int $option Option
+   * @param int $argOne Argument 1
+   * @param int $argTwo Argument 2
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-set-option.php
    * @return bool
@@ -262,7 +262,7 @@ interface JooS_Stream_Interface
    * 
    * This method is called in response to fwrite(). 
    * 
-   * @param string $data
+   * @param string $data Data
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-write.php
    * @return int
@@ -274,7 +274,7 @@ interface JooS_Stream_Interface
    * 
    * This method is called in response to unlink().
    * 
-   * @param string $path
+   * @param string $path Path
    * 
    * @link http://www.php.net/manual/en/streamwrapper.unlink.php
    * @return bool
@@ -286,8 +286,8 @@ interface JooS_Stream_Interface
    * 
    * stream::url_stat — Retrieve information about a file
    *
-   * @param string $path
-   * @param int $flags
+   * @param string $path  Path
+   * @param int    $flags Flags
    * 
    * @link http://www.php.net/manual/en/streamwrapper.url-stat.php
    * @return array

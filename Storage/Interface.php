@@ -3,27 +3,39 @@
 /**
  * @package JooS
  */
+
+/**
+ * Storage interface.
+ */
 interface JooS_Stream_Storage_Interface
 {
 
-    /**
-     * @return string
-     */
-    public function path();
+  /**
+   * Returns storage path.
+   * 
+   * @return string
+   */
+  public function path();
 
-    /**
-     * @return string
-     */
-    public function name();
+  /**
+   * Returns name.
+   * 
+   * @return string
+   */
+  public function name();
 
-    /**
-     * @return JooS_Stream_Storage_Interface
-     */
-    public function storage();
+  /**
+   * Returns storage.
+   * 
+   * @return JooS_Stream_Storage_Interface
+   */
+  public function storage();
 
-    /**
-     * @return JooS_Stream_Entity_Interface
-     */
-    public function content();
+  /**
+   * Returns entiry.
+   * 
+   * @return JooS_Stream_Entity_Interface
+   */
+  public function content();
 
 }

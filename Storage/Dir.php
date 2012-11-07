@@ -5,54 +5,70 @@
  */
 require_once "JooS/Stream/Storage.php";
 
+/**
+ * Directory.
+ */
 final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage implements IteratorAggregate, Countable
 {
 
-    /**
-     * @var JooS_Stream_Storage_List
-     */
-    private $_files = null;
+  /**
+   * @var JooS_Stream_Storage_List
+   */
+  private $_files = null;
 
-    protected function __construct()
-    {
-        parent::__construct();
+  /**
+   * Constructor.
+   */
+  protected function __construct()
+  {
+    parent::__construct();
 
-        require_once "JooS/Stream/Storage/List.php";
+    require_once "JooS/Stream/Storage/List.php";
 
-        $this->_setFiles(new JooS_Stream_Storage_List());
-    }
+    $this->_setFiles(new JooS_Stream_Storage_List());
+  }
 
-    /**
-     * @return JooS_Stream_Storage_List
-     */
-    public function files()
-    {
-        return $this->_files;
-    }
+  /**
+   * Returns all files.
+   * 
+   * @return JooS_Stream_Storage_List
+   */
+  public function files()
+  {
+    return $this->_files;
+  }
 
-    /**
-     * @param JooS_Stream_Storage_List $files 
-     */
-    protected function _setFiles(JooS_Stream_Storage_List $files)
-    {
-        $this->_files = $files;
-    }
+  /**
+   * Sets file list.
+   * 
+   * @param JooS_Stream_Storage_List $files 
+   * 
+   * @return null
+   */
+  protected function _setFiles(JooS_Stream_Storage_List $files)
+  {
+    $this->_files = $files;
+  }
 
-    /**
-     * @return ArrayIterator 
-     */
-    public function getIterator()
-    {
-        return $this->files()->getIterator();
-    }
+  /**
+   * Iterator.
+   * 
+   * @return ArrayIterator 
+   */
+  public function getIterator()
+  {
+    return $this->files()->getIterator();
+  }
 
-    /**
-     * @return int
-     */
-    public function count()
-    {
-        return $this->files()
-            ->count();
-    }
+  /**
+   * Return number of files.
+   * 
+   * @return int
+   */
+  public function count()
+  {
+    return $this->files()
+        ->count();
+  }
 
 }

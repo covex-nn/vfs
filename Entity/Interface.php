@@ -2,33 +2,83 @@
 
 /**
  * @package JooS
+ */
+
+/**
+ * Interface for all stream entities.
  * 
  * @todo описать функции-операции над сущностью
  */
 interface JooS_Stream_Entity_Interface
 {
 
-    const NONE = "None";
-    const FILE = "File";
-    const DIR = "Dir";
-    const UNKNOWN = "Unknown";
+  const NONE = "None";
 
-    public function file_exists();
+  const FILE = "File";
 
-    public function is_dir();
+  const DIR = "Dir";
 
-    public function is_file();
+  const UNKNOWN = "Unknown";
 
-    public function is_readable();
+  /**
+   * File exists ?
+   * 
+   * @return booleans
+   */
+  public function file_exists();
 
-    public function is_writable();
+  /**
+   * Is entity - directory ?
+   * 
+   * @return boolean
+   */
+  public function is_dir();
 
-    public function is_virtual();
+  /**
+   * Is entity - file ?
+   * 
+   * @return boolean
+   */
+  public function is_file();
 
-    public function basename();
+  /**
+   * Is entity - readable ?
+   * 
+   * @return boolean
+   */
+  public function is_readable();
 
-    public function dirname();
+  /**
+   * Is entity - writable ?
+   * 
+   * @return boolean
+   */
+  public function is_writable();
 
-    public function path();
+  /**
+   * Is entity - virtual ?
+   * 
+   * @return boolean
+   */
+  public function is_virtual();
+
+  /**
+   * Returns basename of entity.
+   */
+  public function basename();
+
+  /**
+   * Returns dirname of entity.
+   * 
+   * @return string
+   */
+  public function dirname();
+
+  /**
+   * Returns path of entity.
+   * 
+   * @return string
+   */
+  public function path();
 
 }

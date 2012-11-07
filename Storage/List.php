@@ -123,8 +123,8 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Set new item.
    * 
-   * @param string $offset                       Name
-   * @param JooS_Stream_Storage_Interface $value Value
+   * @param string                        $offset Name
+   * @param JooS_Stream_Storage_Interface $value  Value
    * 
    * @return null
    */

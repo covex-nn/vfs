@@ -64,6 +64,8 @@ interface JooS_Stream_Entity_Interface
 
   /**
    * Returns basename of entity.
+   * 
+   * @return string
    */
   public function basename();
 

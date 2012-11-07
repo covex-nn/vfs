@@ -111,7 +111,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Returns item.
    * 
-   * @param string $name
+   * @param string $offset
    *
    * @return JooS_Stream_Storage_Interface
    */
@@ -123,7 +123,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Set new item.
    * 
-   * @param string $name
+   * @param string $offset
    * @param JooS_Stream_Storage_Interface $value
    * 
    * @return null
@@ -136,7 +136,7 @@ final class JooS_Stream_Storage_List implements IteratorAggregate, Countable, Ar
   /**
    * Delete item.
    * 
-   * @param type $name
+   * @param type $offset
    * 
    * @return null
    */

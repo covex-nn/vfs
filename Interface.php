@@ -184,7 +184,7 @@ interface JooS_Stream_Interface
    * @param string $path
    * @param string $mode
    * @param int $options
-   * @param string $openedPath
+   * @param string &$openedPath
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-open.php
    * @return boolean

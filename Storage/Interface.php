@@ -18,21 +18,21 @@ interface JooS_Stream_Storage_Interface
   public function path();
 
   /**
-   * Returns name.
+   * Return name
    * 
    * @return string
    */
   public function name();
 
   /**
-   * Returns storage.
+   * Return parent storage
    * 
    * @return JooS_Stream_Storage_Interface
    */
   public function storage();
 
   /**
-   * Returns entiry.
+   * Returns entity
    * 
    * @return JooS_Stream_Entity_Interface
    */

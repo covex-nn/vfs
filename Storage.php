@@ -32,7 +32,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
    * Creates new instance.
    * 
    * @param JooS_Stream_Entity_Interface $content Content
-   * @param JooS_Stream_Storage_Dir      $storage Storage
+   * @param JooS_Stream_Storage_Dir      $storage Parent storage
    * 
    * @return JooS_Stream_Storage
    */
@@ -52,13 +52,14 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
     $instance->_setContent($content);
     if (!is_null($storage)) {
       $instance->_setStorage($storage);
+      $storage->add($instance);
     }
 
     return $instance;
   }
 
   /**
-   * Protected constructor.
+   * Protected constructor
    */
   protected function __construct()
   {
@@ -66,16 +67,18 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   }
 
   /**
-   * Returns path.
+   * Returns path
    * 
    * @return string
    */
   public function path()
   {
     $storage = $this->storage();
-
-    $path = "";
-    if (!is_null($storage)) {
+    
+    if (is_null($storage)) {
+      $path = "";
+    }
+    else {
       $path = $storage->path() . "/";
     }
 
@@ -83,7 +86,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   }
 
   /**
-   * Returns name.
+   * Returns name
    * 
    * @return string
    */
@@ -105,7 +108,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   }
 
   /**
-   * Return parent storage.
+   * Return parent storage
    * 
    * @return JooS_Stream_Storage_Dir
    */
@@ -115,7 +118,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   }
 
   /**
-   * Sets parent storage.
+   * Sets parent storage
    * 
    * @param JooS_Stream_Storage_Dir $storage Storage
    * 
@@ -124,13 +127,10 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   protected function _setStorage(JooS_Stream_Storage_Dir $storage)
   {
     $this->_storage = $storage;
-
-    $files = $storage->files();
-    $files[$this->name()] = $this;
   }
 
   /**
-   * Returns entity.
+   * Returns entity
    * 
    * @return JooS_Stream_Entity_Interface
    */
@@ -140,7 +140,7 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   }
 
   /**
-   * Sets entity.
+   * Sets entity
    * 
    * @param JooS_Stream_Entity_Interface $content Content
    * 

@@ -13,9 +13,9 @@ final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage
 {
 
   /**
-   * @var JooS_Stream_Storage_List
+   * @var ArrayObject
    */
-  private $_files = null;
+  private $_items = null;
 
   /**
    * Constructor.
@@ -24,31 +24,7 @@ final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage
   {
     parent::__construct();
 
-    require_once "JooS/Stream/Storage/List.php";
-
-    $this->_setFiles(new JooS_Stream_Storage_List());
-  }
-
-  /**
-   * Returns all files.
-   * 
-   * @return JooS_Stream_Storage_List
-   */
-  public function files()
-  {
-    return $this->_files;
-  }
-
-  /**
-   * Sets file list.
-   * 
-   * @param JooS_Stream_Storage_List $files Files
-   * 
-   * @return null
-   */
-  protected function _setFiles(JooS_Stream_Storage_List $files)
-  {
-    $this->_files = $files;
+    $this->_items = new ArrayObject(array());
   }
 
   /**
@@ -58,18 +34,64 @@ final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage
    */
   public function getIterator()
   {
-    return $this->files()->getIterator();
+    return $this->_items->getIterator();
   }
 
   /**
-   * Return number of files.
+   * Number of items.
    * 
    * @return int
    */
   public function count()
   {
-    return $this->files()
-        ->count();
+    return $this->_items->count();
   }
 
+  /**
+   * Add new storage to list.
+   * 
+   * @param JooS_Stream_Storage_Interface $value
+   * 
+   * @return null
+   */
+  public function add(JooS_Stream_Storage_Interface $value) {
+    $this->_items[$value->name()] = $value;
+  }
+
+  /**
+   * Is item exists ?
+   * 
+   * @param string $name Name
+   * 
+   * @return boolean
+   */
+  public function __isset($name)
+  {
+    return isset($this->_items[$name]);
+  }
+
+  /**
+   * Returns item.
+   * 
+   * @param string $name Name
+   *
+   * @return JooS_Stream_Storage_Interface
+   */
+  public function __get($name)
+  {
+    return isset($this->_items[$name]) ? $this->_items[$name] : null;
+  }
+
+  /**
+   * Delete item.
+   * 
+   * @param type $name Name
+   * 
+   * @return null
+   */
+  public function __unset($name)
+  {
+    unset($this->_items[$name]);
+  }
+  
 }

@@ -4,11 +4,13 @@
   
   class JooS_Stream_Entity_PHPUnit_TestingFile extends JooS_Stream_Entity_Abstract {
     /**
-     * @param string $path
+     * @param string $name filename
+     * @param string $path path
+     * 
      * @return JooS_Stream_Entity_PHPUnit_TestingFile
      */
-    public static function newInstance($path) {
-      return new self($path);
+    public static function newInstance($name, $path) {
+      return new self($name, $path);
     }
     
     public function file_exists() {

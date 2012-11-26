@@ -14,11 +14,11 @@ class JooS_Stream_StorageTest extends PHPUnit_Framework_TestCase
     $nameDir = "qqq";
     $nameFile = "eee.rrr";
 
-    $contentDir = JooS_Stream_Entity_PHPUnit_TestingDir::newInstance($nameDir);
+    $contentDir = JooS_Stream_Entity_PHPUnit_TestingDir::newInstance($nameDir, "path/to/dir");
     /* @var $storageDir JooS_Stream_Storage_Dir */
     $storageDir = JooS_Stream_Storage::newInstance($contentDir, null);
 
-    $contentFile = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance("www/" . $nameFile);
+    $contentFile = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($nameFile, "path/to/file");
     /* @var $storageFile JooS_Stream_Storage_File */
     $storageFile = JooS_Stream_Storage::newInstance($contentFile, $storageDir);
 
@@ -31,8 +31,8 @@ class JooS_Stream_StorageTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(null, $storageDir->storage());
     $this->assertEquals($storageDir, $storageFile->storage());
 
-    $this->assertEquals($nameDir, $storageDir->path());
-    $this->assertEquals($nameDir . "/" . $nameFile, $storageFile->path());
+    $this->assertEquals("/" . $nameDir, $storageDir->path());
+    $this->assertEquals("/" . $nameDir . "/" . $nameFile, $storageFile->path());
 
     $this->assertEquals(1, $storageDir->count());
     $this->assertEquals($storageFile, $storageDir->{$nameFile});

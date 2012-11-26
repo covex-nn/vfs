@@ -9,12 +9,12 @@ class JooS_Stream_Storage_DirTest extends PHPUnit_Framework_TestCase
   {
     require_once "JooS/Stream/Entity/PHPUnit/TestingDir.php";
 
-    $dirContent = JooS_Stream_Entity_PHPUnit_TestingDir::newInstance("qqq");
-    
+    $dirContent = JooS_Stream_Entity_PHPUnit_TestingDir::newInstance("qqq", dirname(__FILE__));
+
     require_once "JooS/Stream/Storage.php";
 
     $dirStorage = JooS_Stream_Storage::newInstance($dirContent);
-    
+
     $this->assertEquals(0, $dirStorage->count());
 
     require_once "JooS/Stream/Entity/PHPUnit/TestingFile.php";
@@ -26,16 +26,16 @@ class JooS_Stream_Storage_DirTest extends PHPUnit_Framework_TestCase
     $name3 = "ttt";
     $name4 = "yyy";
 
-    $contentFile1 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name1);
+    $contentFile1 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name1, "path/to/file1");
     $storageFile1 = JooS_Stream_Storage::newInstance($contentFile1);
 
-    $contentFile2 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name2);
+    $contentFile2 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name2, "path/to/file2");
     $storageFile2 = JooS_Stream_Storage::newInstance($contentFile2);
 
-    $contentFile3 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name3);
+    $contentFile3 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name3, "path/to/file3");
     $storageFile3 = JooS_Stream_Storage::newInstance($contentFile3);
 
-    $contentFile4 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name4);
+    $contentFile4 = JooS_Stream_Entity_PHPUnit_TestingFile::newInstance($name4, "path/to/file4");
     $storageFile4 = JooS_Stream_Storage::newInstance($contentFile4);
 
     $dirStorage->add($storageFile1);

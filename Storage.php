@@ -12,11 +12,6 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
 {
 
   /**
-   * @var string
-   */
-  private $_name = null;
-
-  /**
    * Parent storage
    * 
    * @var JooS_Stream_Storage_Dir
@@ -48,10 +43,10 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
       $instance = new JooS_Stream_Storage_File();
     }
 
-    $instance->_setName($content->basename());
     $instance->_setContent($content);
     if (!is_null($storage)) {
       $instance->_setStorage($storage);
+      
       $storage->add($instance);
     }
 
@@ -67,44 +62,41 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   }
 
   /**
-   * Returns path
+   * Return path
    * 
    * @return string
    */
-  public function path()
+  final public function path()
   {
     $storage = $this->storage();
     
     if (is_null($storage)) {
       $path = "";
-    }
-    else {
-      $path = $storage->path() . "/";
+    } else {
+      $path = $storage->path();
     }
 
-    return $path . $this->name();
+    return $path . "/" . $this->name();
   }
 
   /**
-   * Returns name
+   * Return name
    * 
    * @return string
    */
   final public function name()
   {
-    return $this->_name;
+    return $this->content()->basename();
   }
 
   /**
-   * Set name.
+   * Returns entity
    * 
-   * @param string $name Name
-   * 
-   * @return null
+   * @return JooS_Stream_Entity_Interface
    */
-  protected function _setName($name)
+  final public function content()
   {
-    $this->_name = $name;
+    return $this->_content;
   }
 
   /**
@@ -118,28 +110,6 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   }
 
   /**
-   * Sets parent storage
-   * 
-   * @param JooS_Stream_Storage_Dir $storage Storage
-   * 
-   * @return null
-   */
-  protected function _setStorage(JooS_Stream_Storage_Dir $storage)
-  {
-    $this->_storage = $storage;
-  }
-
-  /**
-   * Returns entity
-   * 
-   * @return JooS_Stream_Entity_Interface
-   */
-  public function content()
-  {
-    return $this->_content;
-  }
-
-  /**
    * Sets entity
    * 
    * @param JooS_Stream_Entity_Interface $content Content
@@ -149,6 +119,18 @@ abstract class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
   protected function _setContent(JooS_Stream_Entity_Interface $content)
   {
     $this->_content = $content;
+  }
+
+  /**
+   * Sets parent storage
+   * 
+   * @param JooS_Stream_Storage_Dir $storage Storage
+   * 
+   * @return null
+   */
+  protected function _setStorage(JooS_Stream_Storage_Dir $storage)
+  {
+    $this->_storage = $storage;
   }
 
 }

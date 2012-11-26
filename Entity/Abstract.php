@@ -10,36 +10,26 @@ require_once "JooS/Stream/Entity/Interface.php";
  */
 abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interface
 {
-
+  /**
+   * @var string
+   */
+  private $_basename;
+  
   /**
    * @var string
    */
   private $_path;
 
   /**
-   * @var boolean
-   */
-  private $_virtual;
-
-  /**
-   * Protected constructor.
+   * Protected constructor
    * 
-   * @param string $path Path
+   * @param string $basename Filename
+   * @param string $path     Path
    */
-  protected function __construct($path)
+  protected function __construct($basename, $path)
   {
+    $this->_setBasename($basename);
     $this->_setPath($path);
-    $this->_setVirtual(false);
-  }
-
-  /**
-   * Is entity virtual ?
-   * 
-   * @return boolean
-   */
-  public function is_virtual()
-  {
-    return $this->_virtual;
   }
 
   /**
@@ -49,17 +39,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
    */
   public function basename()
   {
-    return basename($this->path());
-  }
-
-  /**
-   * Returns dirname of entity.
-   * 
-   * @return string
-   */
-  public function dirname()
-  {
-    return dirname($this->path());
+    return $this->_basename;
   }
 
   /**
@@ -73,7 +53,18 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   }
 
   /**
-   * Sets path.
+   * Sets basename
+   * 
+   * @param string $basename File name
+   * 
+   * @return null
+   */
+  protected function _setBasename($basename) {
+    $this->_basename = $basename;
+  }
+  
+  /**
+   * Sets path
    * 
    * @param string $path Path
    * 
@@ -82,18 +73,6 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   protected function _setPath($path)
   {
     $this->_path = $path;
-  }
-
-  /**
-   * Sets virtual flag.
-   * 
-   * @param boolean $virtual Virtual
-   * 
-   * @return null
-   */
-  protected function _setVirtual($virtual)
-  {
-    $this->_virtual = !!$virtual;
   }
 
 }

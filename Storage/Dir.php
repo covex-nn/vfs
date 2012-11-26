@@ -55,6 +55,10 @@ final class JooS_Stream_Storage_Dir extends JooS_Stream_Storage
    * @return null
    */
   public function add(JooS_Stream_Storage_Interface $value) {
+    /**
+     * @todo нужно бросать Exception, если isset !!!
+     */
+    
     $this->_items[$value->name()] = $value;
   }
 

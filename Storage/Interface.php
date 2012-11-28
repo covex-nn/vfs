@@ -11,26 +11,12 @@ interface JooS_Stream_Storage_Interface
 {
 
   /**
-   * Returns storage path.
+   * Constructor
    * 
-   * @return string
+   * @param JooS_Stream_Entity_Interface $content Entity
    */
-  public function path();
-
-  /**
-   * Return name
-   * 
-   * @return string
-   */
-  public function name();
-
-  /**
-   * Return parent storage
-   * 
-   * @return JooS_Stream_Storage_Interface
-   */
-  public function storage();
-
+  public function __construct(JooS_Stream_Entity_Interface $content);
+  
   /**
    * Returns entity
    * 

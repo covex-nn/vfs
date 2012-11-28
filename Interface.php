@@ -19,6 +19,7 @@ interface JooS_Stream_Interface
    * right before stream::stream_open().
    * 
    * @link http://www.php.net/manual/en/streamwrapper.construct.php
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function __construct();
 
@@ -31,6 +32,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.dir-closedir.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_closedir();
 
@@ -44,6 +46,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.dir-opendir.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_opendir($path, $options);
 
@@ -54,6 +57,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.dir-readdir.php
    * @return string
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_readdir();
 
@@ -68,6 +72,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.dir-rewinddir.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_rewinddir();
 
@@ -82,6 +87,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.mkdir.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function mkdir($path, $mode, $options);
 
@@ -97,6 +103,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.rename.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function rename($pathFrom, $pathTo);
 
@@ -110,6 +117,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.rmdir.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function rmdir($path, $options);
 
@@ -122,6 +130,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-cast.php
    * @return resource
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_cast($castAs);
 
@@ -135,6 +144,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-close.php
    * @return null
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_close();
 
@@ -145,6 +155,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-eof.php
    * @return bool
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_eof();
 
@@ -158,6 +169,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-flush.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_flush();
 
@@ -172,6 +184,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-lock.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_lock($operation);
 
@@ -188,6 +201,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-open.php
    * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_open($path, $mode, $options, &$openedPath);
 
@@ -200,6 +214,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-read.php
    * @return string
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_read($count);
 
@@ -215,7 +230,8 @@ interface JooS_Stream_Interface
    * @param int $whence = SEEK_SET
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-seek.php
-   * @return bool
+   * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_seek($offset, $whence = SEEK_SET);
 
@@ -233,7 +249,8 @@ interface JooS_Stream_Interface
    * @param int $argTwo Argument 2
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-set-option.php
-   * @return bool
+   * @return boolean
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_set_option($option, $argOne, $argTwo);
 
@@ -244,6 +261,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-stat.php
    * @return array
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_stat();
 
@@ -254,6 +272,7 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-tell.php
    * @return int
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_tell();
 
@@ -266,6 +285,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-write.php
    * @return int
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_write($data);
 
@@ -278,6 +298,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.unlink.php
    * @return bool
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function unlink($path);
 
@@ -291,6 +312,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.url-stat.php
    * @return array
+   * @todo JooS_Stream_Wrapper_FS
    */
   public function url_stat($path, $flags);
 

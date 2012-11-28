@@ -72,7 +72,8 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
    */
   protected function _setPath($path)
   {
-    $this->_path = $path;
+    $unixPath = str_replace("\\", "/", $path);
+    $this->_path = $unixPath;
   }
 
 }

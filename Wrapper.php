@@ -11,6 +11,11 @@ abstract class JooS_Stream_Wrapper
 {
   
   /**
+   * @var string
+   */
+  protected static $_protocol;
+  
+  /**
    * Register stream wrapper
    * 
    * @param string $protocol Protocol name
@@ -19,7 +24,7 @@ abstract class JooS_Stream_Wrapper
    * @throws JooS_Stream_Wrapper_Exception
    * @return boolean
    */
-  final public static function register($protocol, $flags = 0)
+  public static function register($protocol, $flags = 0)
   {
     $wrappers = stream_get_wrappers();
     if (in_array($protocol, $wrappers)) {
@@ -37,12 +42,12 @@ abstract class JooS_Stream_Wrapper
   /**
    * Unregister stream wrapper
    * 
-   * @param string $protocol
+   * @param string $protocol Protocol name
    * 
    * @throws JooS_Stream_Wrapper_Exception
    * @return boolean
    */
-  final public static function unregister($protocol)
+  public static function unregister($protocol)
   {
     $wrappers = stream_get_wrappers();
     if (!in_array($protocol, $wrappers)) {
@@ -55,5 +60,6 @@ abstract class JooS_Stream_Wrapper
     
     return stream_wrapper_unregister($protocol);
   }
+  
 }
 

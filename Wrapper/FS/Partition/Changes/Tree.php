@@ -137,23 +137,41 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
     if ($path) {
       $parts = $this->split($path);
       $name = array_shift($parts);
+      
+      $children = array();
       if (isset($this->_subTrees[$name])) {
         $subtree = $this->_subTrees[$name];
         /* @var $subtree JooS_Stream_Wrapper_FS_Partition_Changes_Tree */
-        
-        $children = $subtree->children($parts);
-      } else {
-        $children = array();
+        $this->_appendChildren(
+          $children, $name, $subtree->children($parts)
+        );
       }
     } else {
-      $children = array_values($this->_ownData);
-      foreach ($this->_subTrees as $subtree) {
+      $children = $this->_ownData;
+      foreach ($this->_subTrees as $name => $subtree) {
         /* @var $subtree JooS_Stream_Wrapper_FS_Partition_Changes_Tree */
-        $children = array_merge($children, $subtree->children());
+        $this->_appendChildren(
+          $children, $name, $subtree->children()
+        );
       }
     }
     
     return $children;
+  }
+
+  /**
+   * Add new children to array
+   * 
+   * @param array  $children  Children array
+   * @param string $name      Current name
+   * @param array  $_children Children of subtrees
+   * 
+   * @return null
+   */
+  private function _appendChildren(array &$children, $name, array $_children) {
+    foreach ($_children as $key => $value) {
+      $children[$name . "/" . $key] = $value;
+    }
   }
   
   /**

@@ -6,65 +6,50 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
 {
 
   protected $protocol = null;
-  
-  public function testRegister() {
+
+  public function testRegister()
+  {
     $this->assertTrue(
       in_array($this->protocol, stream_get_wrappers())
     );
   }
-  
-  public function testSetup() {
-    $counter = 0;
-    $name = $this->_randomValue();
-    JooS_Stream_Wrapper_FS::fsSetup($name, __DIR__);
-    
-    try {
-      JooS_Stream_Wrapper_FS::fsSetup($name, __DIR__);
-    }
-    catch (JooS_Stream_Wrapper_FS_Exception $e) {
-      $counter++;
-    }
-    $this->assertEquals(1, $counter, "Exception counter == 1");
-    
-    $this->assertTrue(JooS_Stream_Wrapper_FS::fsExists($name));
-    JooS_Stream_Wrapper_FS::fsClear($name);
-    $this->assertFalse(JooS_Stream_Wrapper_FS::fsExists($name));
-    
-    try {
-      JooS_Stream_Wrapper_FS::fsSetup($name, __FILE__);
-    }
-    catch (JooS_Stream_Wrapper_FS_Exception $e) {
-      $counter++;
-    }
-    $this->assertEquals(2, $counter, "Exception counter == 2");
-    
-    $this->assertFalse(JooS_Stream_Wrapper_FS::fsExists($name));
+
+  public function testStat()
+  {
+    $realDir = $this->_getFsRoot();
+    $realFile = $realDir . "/file1.txt";
+
+    $streamFile1 = $this->protocol . "://file1.txt";
+    $this->assertEquals(stat($realFile), stat($streamFile1));
+
+    $streamFile2 = $this->protocol . "://dir_not_exists/file_not_exists.txt";
+    $this->assertEquals(false, @stat($streamFile2));
+
+    $streamFile2 = $this->protocol . "://file_not_exists.txt";
+    $this->assertEquals(false, @stat($streamFile2));
   }
-  
-  public function testDir() {
-    $fsname = $this->_getFsRoot();
-    
+
+  public function testDir()
+  {
     $realDir = $this->_getFsRoot();
     $realFiles0 = $this->_testDirGetFiles($realDir);
-    
+
     $rfIndex = array_search("..", $realFiles0);
     unset($realFiles0[$rfIndex]);
+
     $realFiles = array_values($realFiles0);
 
-    JooS_Stream_Wrapper_FS::fsSetup($fsname, $realDir);
-    
     $streamDir = $this->protocol . "://";
     $streamFiles = $this->_testDirGetFiles($streamDir);
-    
-    JooS_Stream_Wrapper_Fs::fsClear($fsname);
-    
+
     $this->assertEquals($realFiles, $streamFiles);
   }
-  
-  protected function _testDirGetFiles($dir) {
+
+  protected function _testDirGetFiles($dir)
+  {
     if (is_dir($dir)) {
       $files = array();
-      
+
       $dh = opendir($dir);
       if ($dh) {
         while (($file = readdir($dh)) !== false) {
@@ -81,28 +66,29 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
 
   protected function setUp()
   {
-    if (is_null($this->protocol))
-    {
+    if (is_null($this->protocol)) {
       $this->protocol = $this->_randomValue();
     }
 
-    JooS_Stream_Wrapper_FS::register($this->protocol);
+    JooS_Stream_Wrapper_FS::register($this->protocol, $this->_getFsRoot());
   }
 
   protected function tearDown()
   {
     try {
       JooS_Stream_Wrapper_FS::unregister($this->protocol);
-    }
-    catch (JooS_Stream_Wrapper_Exception $e) {
+    } catch (JooS_Stream_Wrapper_Exception $e) {
+      
     }
   }
-  
-  protected function _randomValue() {
-    return uniqid("stream");
+
+  protected function _randomValue($prefix = "stream")
+  {
+    return uniqid($prefix);
   }
-  
-  protected function _getFsRoot() {
+
+  protected function _getFsRoot()
+  {
     return dirname(__FILE__) . "/_root";
   }
 

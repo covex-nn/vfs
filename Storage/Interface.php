@@ -22,6 +22,6 @@ interface JooS_Stream_Storage_Interface
    * 
    * @return JooS_Stream_Entity_Interface
    */
-  public function content();
+  public function entity();
 
 }

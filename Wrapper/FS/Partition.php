@@ -3,11 +3,12 @@
 /**
  * @package JooS
  */
+require_once "JooS/Stream/Wrapper/FS/Partition/Interface.php";
 
 /**
  * Filesystem tree.
  */
-class JooS_Stream_Wrapper_FS_Tree
+class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partition_Interface
 {
   
   /**
@@ -16,9 +17,14 @@ class JooS_Stream_Wrapper_FS_Tree
   private $_root = null;
   
   /**
-   * @var array
+   * @var JooS_Stream_Wrapper_FS_Partition_Changes_Linear
    */
-  private $_changes = null;
+  private $_changesLinear = null;
+  
+  /**
+   * @var JooS_Stream_Wrapper_FS_Partition_Changes_Tree
+   */
+  private $_changesTree = null;
   
   /**
    * Constructor
@@ -28,7 +34,26 @@ class JooS_Stream_Wrapper_FS_Tree
   public function __construct(JooS_Stream_Entity_Interface $content)
   {
     $this->setRoot($content);
-    $this->clearChanges();
+
+    require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Linear.php";
+    
+    $this->_changesLinear = new JooS_Stream_Wrapper_FS_Partition_Changes_Linear();
+
+    require_once "JooS/Stream/Wrapper/FS/Partition/Changes/.php";
+    
+    $this->_changesTree = new JooS_Stream_Wrapper_FS_Partition_Changes_Tree();
+  }
+  
+  /**
+   * Create a directory
+   *
+   * @param string $path    Path
+   * @param int    $mode    Mode
+   * @param int    $options Options
+   * 
+   * @return boolean
+   */
+  public function makeDirectory($path, $mode, $options) {
   }
   
   /**
@@ -39,7 +64,7 @@ class JooS_Stream_Wrapper_FS_Tree
    * @return JooS_Stream_Entity_Interface
    * @throws JooS_Stream_Wrapper_FS_Exception
    */
-  public function getContent($filename) {
+  public function getEntity($filename) {
     $unixFilename = str_replace("\\", "/", $filename);
     $parts = explode(
       "/", trim($unixFilename, "/")
@@ -47,7 +72,7 @@ class JooS_Stream_Wrapper_FS_Tree
     $basename = array_pop($parts);
     
     $partiallyPath = "";
-    $directory = $this->getRoot()->content();
+    $directory = $this->getRoot()->entity();
     
     foreach ($parts as $name) {
       $partiallyPath .= "/" . $name;
@@ -60,7 +85,6 @@ class JooS_Stream_Wrapper_FS_Tree
         // $directory = ...
       }
       elseif (!file_exists($path) || !is_dir($path)) {
-        /** @todo null или exception ? */
         return null;
       }
     }
@@ -104,10 +128,6 @@ class JooS_Stream_Wrapper_FS_Tree
     require_once "JooS/Stream/Storage.php";
     
     $this->_root = new JooS_Stream_Storage($content);
-  }
-  
-  protected function clearChanges() {
-    $this->_changes = array();
   }
   
 }

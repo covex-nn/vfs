@@ -312,7 +312,6 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.url-stat.php
    * @return array
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function url_stat($path, $flags);
 

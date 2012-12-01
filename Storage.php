@@ -18,10 +18,12 @@ class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
 
   /**
    * Protected constructor
+   * 
+   * @param JooS_Stream_Entity_Interface $entity Stream entity
    */
-  public function __construct(JooS_Stream_Entity_Interface $content)
+  public function __construct(JooS_Stream_Entity_Interface $entity)
   {
-    $this->setContent($content);
+    $this->setEntity($entity);
   }
 
   /**
@@ -29,7 +31,7 @@ class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
    * 
    * @return JooS_Stream_Entity_Interface
    */
-  final public function content()
+  final public function entity()
   {
     return $this->_content;
   }
@@ -41,7 +43,7 @@ class JooS_Stream_Storage implements JooS_Stream_Storage_Interface
    * 
    * @return null
    */
-  public function setContent(JooS_Stream_Entity_Interface $content)
+  public function setEntity(JooS_Stream_Entity_Interface $content)
   {
     $this->_content = $content;
   }

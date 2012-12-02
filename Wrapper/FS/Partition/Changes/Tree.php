@@ -28,7 +28,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
   }
   
   /**
-   * Return stream storage
+   * Return stream entiry
    * 
    * @param string $path Path
    * 
@@ -36,22 +36,22 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    */
   public function get($path)
   {
-    $storage = null;
+    $entity = null;
     
     $name = null;
     $subtree = $this->subtree($path, $name);
     if (!is_null($subtree) && isset($subtree->_ownData[$name])) {
-      $storage = $subtree->_ownData[$name];
+      $entity = $subtree->_ownData[$name];
     }
     
-    return $storage;
+    return $entity;
   }
   
   /**
-   * Add stream storage to changes array
+   * Add stream entity to changes array
    * 
    * @param string                       $path   Path
-   * @param JooS_Stream_Entity_Interface $entity Stream storage
+   * @param JooS_Stream_Entity_Interface $entity Stream entity
    * 
    * @return boolean
    */
@@ -72,7 +72,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
   }
   
   /**
-   * Delete stream storage from array
+   * Delete stream entity from array
    * 
    * @param string $path Path
    * 
@@ -126,6 +126,26 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
     return sizeof($this->_ownData) + sizeof($this->_subTrees);
   }
   
+  public function own($path = "") {
+    if ($path) {
+      $parts = $this->split($path);
+      $name = array_shift($parts);
+      
+      $own = array();
+      if (isset($this->_subTrees[$name])) {
+        $subtree = $this->_subTrees[$name];
+        /* @var $subtree JooS_Stream_Wrapper_FS_Partition_Changes_Tree */
+        $this->_appendChildren(
+          $own, $name, $subtree->own($parts)
+        );
+      }
+    }
+    else {
+      $own = $this->_ownData;
+    }
+    return $own;
+  }
+  
   /**
    * Return all children in path/*.*
    * 
@@ -147,7 +167,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
         );
       }
     } else {
-      $children = $this->_ownData;
+      $children = $this->own();
       foreach ($this->_subTrees as $name => $subtree) {
         /* @var $subtree JooS_Stream_Wrapper_FS_Partition_Changes_Tree */
         $this->_appendChildren(

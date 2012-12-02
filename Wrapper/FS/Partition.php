@@ -111,32 +111,44 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
     $parts = explode(
       "/", trim($unixFilename, "/")
     );
-    $basename = array_pop($parts);
+    array_pop($parts);
     
-    $partiallyPath = "";
+    $filepath = "";
     $directory = $this->getRoot();
-    
+
+    $changes = false;
     foreach ($parts as $name) {
-      $partiallyPath .= "/" . $name;
-      $path = $directory->path() . $partiallyPath;
+      $filepath .= ($filepath ? "/" : "") . $name;
       
-      if (false) {
-        /** @todo сделать проверку на изменения в текущей fs */
+      if ($changes || $this->_changesLinear->exists($filepath)) {
+        $changes = true;
+        $directory = $this->_changesLinear->get($filepath);
         
-        // $partiallyPath = "";
-        // $directory = ...
-      } elseif (!file_exists($path) || !is_dir($path)) {
-        return null;
+        if (is_null($directory)) {
+          return null;
+        } elseif (!$directory->file_exists()) {
+          return null;
+        } elseif (!$directory->is_dir()) {
+          return null;
+        }
+      } else {
+        $path = $directory->path() . "/" . $filepath;
+        if (!file_exists($path) || !is_dir($path)) {
+          return null;
+        }
       }
     }
     
-    $path = $directory->path() . $partiallyPath . "/" . $basename;
-    
-    /** @todo надо сделать проверку на изменения в текущей fs */
-    
-    require_once "JooS/Stream/Entity.php";
-    
-    return JooS_Stream_Entity::newInstance($path);
+    if ($this->_changesLinear->exists($filename)) {
+      $entity = $this->_changesLinear->get($filename);
+    } else {
+      require_once "JooS/Stream/Entity.php";
+
+      $entity = JooS_Stream_Entity::newInstance(
+        $directory->path() . "/" . $filename
+      );
+    }
+    return $entity;
   }
   
   /**
@@ -159,6 +171,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
         require_once "JooS/Stream/Entity/Virtual.php";
         
         $result = JooS_Stream_Entity_Virtual::newInstance($entity, $tmpPath);
+        $this->_changesRegister($path, $result);
       }
     } else {
       /* @todo сделать поддержку STREAM_MKDIR_RECURSIVE */
@@ -171,6 +184,19 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
     }
     
     return $result;
+  }
+
+  /**
+   * Register changes in FS
+   * 
+   * @param string                       $path   Path to changes
+   * @param JooS_Stream_Entity_Interface $entity Entity
+   * 
+   * @return null
+   */
+  protected function _changesRegister($path, JooS_Stream_Entity_Interface $entity) {
+    $this->_changesLinear->add($path, $entity);
+    $this->_changesTree->add($path, $entity);
   }
   
   /**

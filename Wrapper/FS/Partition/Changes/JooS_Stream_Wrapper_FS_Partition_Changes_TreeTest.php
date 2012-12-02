@@ -33,6 +33,11 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_TreeTest extends PHPUnit_Framewor
     $this->assertEquals($expectedChildren, $changes->children("qqq/www"));
     $this->assertEquals(array(), $changes->children("qqq/www/eee"));
 
+    $this->assertEquals(array(), $changes->own());
+    $this->assertEquals(array(), $changes->own("qqq"));
+    $this->assertEquals(array("qqq/www/eee" => $entity), $changes->own("qqq/www"));
+    $this->assertEquals(array(), $changes->own("qqq/www/eee"));
+    
     $this->assertTrue($changes->delete("qqq/www/eee"));
 
     $this->assertFalse($changes->exists("qqq/www/eee"));

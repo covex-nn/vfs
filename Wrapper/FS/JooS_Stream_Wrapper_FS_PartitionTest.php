@@ -58,12 +58,24 @@ class JooS_Stream_Wrapper_FS_PartitionTest extends PHPUnit_Framework_TestCase
 
     $result2 = $fs->makeDirectory("dir2", 0777, STREAM_REPORT_ERRORS);
     $this->assertTrue($result2 instanceof JooS_Stream_Entity_Virtual);
+    $result2Path = $result2->path();
+    $this->assertTrue(is_dir($result2Path));
+    
+    $entityDir2 = $fs->getEntity("dir2");
+    $this->assertEquals($result2->path(), $entityDir2->path());
 
-    $path = $result2->path();
-    $this->assertTrue(is_dir($path));
+    $entityDir23 = $fs->getEntity("dir2/dir3");
+    $this->assertFalse(is_null($entityDir23));
+    $this->assertFalse($entityDir23->file_exists());
+    
+    $entityDir234 = $fs->getEntity("dir2/dir3/dir4");
+    $this->assertTrue(is_null($entityDir234));
+    
+    /** @todo протестировать удаление директории */
+    /** @todo протестировать удаление директории и создание там файла */
+    
     unset($fs);
-
-    $this->assertFalse(file_exists($path));
+    $this->assertFalse(file_exists($result2Path));
   }
 
   private function _getRoot()

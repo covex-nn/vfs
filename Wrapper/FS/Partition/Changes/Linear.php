@@ -26,7 +26,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Linear
    * 
    * @param string $path Path
    * 
-   * @return JooS_Stream_Storage_Interface
+   * @return JooS_Stream_Entity_Interface
    */
   public function get($path)
   {
@@ -40,16 +40,16 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Linear
   /**
    * Add stream storage to changes array
    * 
-   * @param string                        $path    Path
-   * @param JooS_Stream_Storage_Interface $storage Stream storage
+   * @param string                       $path   Path
+   * @param JooS_Stream_Entity_Interface $entity Stream entity
    * 
    * @return boolean
    */
-  public function add($path, JooS_Stream_Storage_Interface $storage)
+  public function add($path, JooS_Stream_Entity_Interface $entity)
   {
     $result = false;
     if (!$this->exists($path)) {
-      $this->_data[$path] = $storage;
+      $this->_data[$path] = $entity;
       
       $result = true;
     }

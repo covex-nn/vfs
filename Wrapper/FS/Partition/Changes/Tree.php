@@ -32,7 +32,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    * 
    * @param string $path Path
    * 
-   * @return JooS_Stream_Storage_Interface
+   * @return JooS_Stream_Entity_Interface
    */
   public function get($path)
   {
@@ -50,12 +50,12 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
   /**
    * Add stream storage to changes array
    * 
-   * @param string                        $path    Path
-   * @param JooS_Stream_Storage_Interface $storage Stream storage
+   * @param string                       $path   Path
+   * @param JooS_Stream_Entity_Interface $entity Stream storage
    * 
    * @return boolean
    */
-  public function add($path, JooS_Stream_Storage_Interface $storage)
+  public function add($path, JooS_Stream_Entity_Interface $entity)
   {
     $result = false;
     
@@ -63,7 +63,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
       $name = null;
       $subtree = $this->subtree($path, $name, true);
       if (!isset($subtree->_ownData[$name])) {
-        $subtree->_ownData[$name] = $storage;
+        $subtree->_ownData[$name] = $entity;
         $result = true;
       }
     }

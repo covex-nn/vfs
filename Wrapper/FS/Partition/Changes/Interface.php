@@ -16,19 +16,19 @@ interface JooS_Stream_Wrapper_FS_Partition_Changes_Interface
    * 
    * @param string $path Path
    * 
-   * @return JooS_Stream_Storage_Interface
+   * @return JooS_Stream_Entity_Interface
    */
   public function get($path);
   
   /**
    * Add stream storage to changes array
    * 
-   * @param string                        $path    Path
-   * @param JooS_Stream_Storage_Interface $storage Stream storage
+   * @param string                       $path   Path
+   * @param JooS_Stream_Entity_Interface $entity Stream entity
    * 
    * @return boolean
    */
-  public function add($path, JooS_Stream_Storage_Interface $storage);
+  public function add($path, JooS_Stream_Entity_Interface $entity);
   
   /**
    * Delete stream storage from array

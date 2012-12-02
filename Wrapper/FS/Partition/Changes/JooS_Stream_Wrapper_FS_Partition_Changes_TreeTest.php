@@ -19,18 +19,14 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_TreeTest extends PHPUnit_Framewor
 
     $entity = JooS_Stream_Entity::newInstance(__FILE__);
 
-    require_once "JooS/Stream/Storage.php";
-
-    $storage = new JooS_Stream_Storage($entity);
-
-    $changes->add("qqq/www/eee", $storage);
+    $changes->add("qqq/www/eee", $entity);
 
     $this->assertTrue($changes->exists("qqq/www/eee"));
-    $this->assertEquals($storage, $changes->get("qqq/www/eee"));
+    $this->assertEquals($entity, $changes->get("qqq/www/eee"));
     $this->assertEquals(1, $changes->count());
-    
+
     $expectedChildren = array(
-      "qqq/www/eee" => $storage
+      "qqq/www/eee" => $entity
     );
     $this->assertEquals($expectedChildren, $changes->children());
     $this->assertEquals($expectedChildren, $changes->children("qqq"));

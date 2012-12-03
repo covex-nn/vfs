@@ -53,7 +53,76 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
     
-    return $partition->makeDirectory($path, $mode, $options);
+    return !!$partition->makeDirectory($path, $mode, $options);
+  }
+  
+  private $_dirFiles;
+  
+  /**
+   * Open directory handle
+   * 
+   * @param string $url     Path
+   * @param int    $options Options
+   * 
+   * @return boolean
+   */
+  public function dir_opendir($url, $options) {
+    $partition = self::getPartition($url);
+    $path = self::getRelativePath($url);
+    
+    $files = $partition->getList($path);
+    if (is_array($files)) {
+      $this->_dirFiles = array();
+      foreach ($files as $file) {
+        /* @var $file JooS_Stream_Entity_Interface */
+        $this->_dirFiles[] = $file->basename();
+      }
+      
+      $result = true;
+    } else {
+      $result = false;
+    }
+    
+    return $result;
+  }
+  
+  /**
+   * Read entry from directory handle
+   *
+   * @return string
+   */
+  public function dir_readdir() {
+    $each = each($this->_dirFiles);
+    
+    if ($each === false) {
+      $result = false;
+    } else {
+      $result = $each["value"];
+    }
+    
+    return $result;
+  }
+  
+  /**
+   * Close directory handle
+   *
+   * @return boolean
+   */
+  public function dir_closedir() {
+    unset($this->_dirFiles);
+    
+    return true;
+  }
+  
+  /**
+   * Rewind directory handle
+   *
+   * @return boolean
+   */
+  public function dir_rewinddir() {
+    reset($this->_dirFiles);
+    
+    return true;
   }
   
   /**

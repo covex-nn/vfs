@@ -190,6 +190,70 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
     
     return $result;
   }
+  
+  /**
+   * Return list of file in path
+   * 
+   * @param string $path Path
+   * 
+   * @return array
+   */
+  public function getList($path) {
+    $entity = $this->getEntity($path);
+    
+    if (!is_null($entity) && $entity->file_exists() && $entity->is_dir()) {
+      $files = array();
+      $changes = $this->_changesTree->own($path);
+
+      if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
+        $directory = $this->getRoot();
+        $directoryPath = $directory->path() . "/" . $path;
+        
+        $dh = opendir($directoryPath);
+        if ($dh) {
+          require_once "JooS/Stream/Entity.php";
+          
+          while (true) {
+            $file = readdir($dh);
+            if ($file === false) {
+              break;
+            } elseif ($file == "." || $file == "..") {
+              continue;
+            }
+            
+            $changesKey = $path . "/" . $file;
+            if (isset($changes[$changesKey])) {
+              continue;
+            } else {
+              $files[$changesKey] = JooS_Stream_Entity::newInstance($changesKey);
+            }
+          }
+          closedir($dh);
+        }
+      }
+      
+      foreach ($changes as $changesKey => $file) {
+        /* @var $file JooS_Stream_Entity_Interface */
+        if ($file instanceof JooS_Stream_Entity_Deleted_Interface) {
+          unset($changes[$changesKey]);
+        }
+      }
+      
+      $mergedFiles = array_merge($files, $changes);
+      ksort($mergedFiles);
+      
+      $result = array_values($mergedFiles);
+    } else {
+      $result = null;
+    }
+    
+    return $result;
+  }
+  
+  public function removeDirectory($path, $options) {
+// STREAM_MKDIR_RECURSIVE
+// if ($options & STREAM_REPORT_ERRORS) {
+  }
 
   /**
    * Register changes in FS

@@ -84,7 +84,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   public function is_writable()
   {
     $path = $this->path();
-    return is_writable($path);
+    return $this->file_exists() && is_writable($path);
   }
   
   /**
@@ -95,7 +95,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   public function is_readable()
   {
     $path = $this->path();
-    return is_readable($path);
+    return $this->file_exists() && is_readable($path);
   }
   
   /**
@@ -106,7 +106,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   public function is_dir()
   {
     $path = $this->path();
-    return is_dir($path);
+    return $this->file_exists() && is_dir($path);
   }
   
   /**
@@ -117,7 +117,7 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   public function is_file()
   {
     $path = $this->path();
-    return is_file($path);
+    return $this->file_exists() && is_file($path);
   }
   
   /**

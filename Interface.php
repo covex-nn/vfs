@@ -77,21 +77,6 @@ interface JooS_Stream_Interface
   public function dir_rewinddir();
 
   /**
-   * Create a directory
-   *
-   * This method is called in response to mkdir().
-   *
-   * @param string $path    Path
-   * @param int    $mode    Mode
-   * @param int    $options Options
-   * 
-   * @link http://www.php.net/manual/en/streamwrapper.mkdir.php
-   * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
-   */
-  public function mkdir($path, $mode, $options);
-
-  /**
    * Renames a file or directory
    *
    * This method is called in response to rename().

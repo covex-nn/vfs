@@ -21,7 +21,13 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * @return array
    */
   public function url_stat($url, $flags) {
-    $path = self::getPath($url);
+    $entity = $this->getEntity($url);
+    
+    if (!is_null($entity)) {
+      $path = $entity->path();
+    } else {
+      $path = null;
+    }
     
     if (is_null($path)) {
       $stat = false;
@@ -34,6 +40,22 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
     return $stat;
   }
 
+  /**
+   * Create a directory
+   *
+   * @param string $url     Path
+   * @param int    $mode    Mode
+   * @param int    $options Options
+   * 
+   * @return boolean
+   */
+  public function mkdir($url, $mode, $options) {
+    $partition = self::getPartition($url);
+    $path = self::getRelativePath($url);
+    
+    return $partition->makeDirectory($path, $mode, $options);
+  }
+  
   /**
    * @var array
    */
@@ -115,23 +137,17 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
   }
   
   /**
-   * Return real file path
+   * Return entity by url
    * 
    * @param string $url
    * 
-   * @return string
+   * @return JooS_Stream_Entity_Interface
    */
-  protected static function getPath($url) {
-    $path = null;
-    
+  protected static function getEntity($url) {
     $partition = self::getPartition($url);
     $relativePath = self::getRelativePath($url);
     
-    $entity = $partition->getEntity($relativePath);
-    if (!is_null($entity)) {
-      $path = $entity->path();
-    }
-    
-    return $path;
+    return $partition->getEntity($relativePath);
   }
+
 }

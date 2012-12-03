@@ -111,24 +111,27 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
     $parts = explode(
       "/", trim($unixFilename, "/")
     );
-    array_pop($parts);
+    $basename = array_pop($parts);
     
     $filepath = "";
+    $partiallyFilepath = "";
+    $changesStage = false;
     $directory = $this->getRoot();
 
-    $changes = false;
     foreach ($parts as $name) {
       $filepath .= ($filepath ? "/" : "") . $name;
+      $partiallyFilepath = ($partiallyFilepath ? "/" : "") . $name;
       
-      if ($changes || $this->_changesLinear->exists($filepath)) {
-        $changes = true;
-        $directory = $this->_changesLinear->get($filepath);
-        
-        if (is_null($directory)) {
-          return null;
-        } elseif (!$directory->file_exists()) {
-          return null;
-        } elseif (!$directory->is_dir()) {
+      $changesExists = $this->_changesLinear->exists($filepath);
+      if ($changesExists || $changesStage) {
+        $changesStage = true;
+        if ($changesExists) {
+          $directory = $this->_changesLinear->get($filepath);
+          $partiallyFilepath = "";
+          if (!$directory->file_exists() || !$directory->is_dir()) {
+            return null;
+          }
+        } else {
           return null;
         }
       } else {
@@ -145,7 +148,9 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
       require_once "JooS/Stream/Entity.php";
 
       $entity = JooS_Stream_Entity::newInstance(
-        $directory->path() . "/" . $filename
+        $directory->path() .
+        ($partiallyFilepath ? "/" . $partiallyFilepath : "") .
+        "/" . $basename
       );
     }
     return $entity;

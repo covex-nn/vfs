@@ -28,10 +28,11 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     $streamFile2 = $this->protocol . "://file_not_exists.txt";
     $this->assertEquals(false, @stat($streamFile2));
   }
-  
-  public function testMkdir() {
+
+  public function testMkdir()
+  {
     $dir2 = $this->protocol . "://dir2";
-    
+
     $this->assertFalse(file_exists($dir2));
     mkdir($dir2);
 
@@ -44,9 +45,10 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     $realDir = $this->_getFsRoot();
     $realFiles0 = $this->_testDirGetFiles($realDir);
 
-    $rfIndex = array_search("..", $realFiles0);
-    unset($realFiles0[$rfIndex]);
-
+    $rfIndexDot = array_search(".", $realFiles0);
+    unset($realFiles0[$rfIndexDot]);
+    $rfIndexDotDot = array_search("..", $realFiles0);
+    unset($realFiles0[$rfIndexDotDot]);
     $realFiles = array_values($realFiles0);
 
     $streamDir = $this->protocol . "://";
@@ -65,6 +67,14 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
         while (($file = readdir($dh)) !== false) {
           $files[] = $file;
         }
+        
+        rewinddir($dh);
+        $filesAfterRewind = array();
+        while (($file = readdir($dh)) !== false) {
+          $filesAfterRewind[] = $file;
+        }
+        $this->assertEquals($files, $filesAfterRewind);
+
         closedir($dh);
       }
       sort($files);

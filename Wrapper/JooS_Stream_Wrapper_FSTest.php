@@ -42,21 +42,37 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
 
   public function testDir()
   {
-    $realDir = $this->_getFsRoot();
-    $realFiles0 = $this->_testDirGetFiles($realDir);
+    $streamFiles0 = $this->_testDirGetFiles($this->protocol . "://dir3");
+    $this->assertEquals(null, $streamFiles0);
 
-    $rfIndexDot = array_search(".", $realFiles0);
-    unset($realFiles0[$rfIndexDot]);
-    $rfIndexDotDot = array_search("..", $realFiles0);
-    unset($realFiles0[$rfIndexDotDot]);
-    $realFiles = array_values($realFiles0);
+    $streamFiles1 = $this->_testDirGetFiles($this->protocol . "://dir1");
+    $this->assertEquals(array("file2.txt"), $streamFiles1);
 
-    $streamDir = $this->protocol . "://";
-    $streamFiles = $this->_testDirGetFiles($streamDir);
+    $mkdir1 = mkdir($this->protocol . "://dir1/dir2");
+    $this->assertTrue($mkdir1);
 
-    $this->assertEquals($realFiles, $streamFiles);
+    $streamFiles2 = $this->_testDirGetFiles($this->protocol . "://dir1");
+    $this->assertEquals(array("dir2", "file2.txt"), $streamFiles2);
+    
+    $rmdir1 = rmdir($this->protocol . "://dir1/dir2");
+    $this->assertTrue($rmdir1);
+    
+    $streamFiles3 = $this->_testDirGetFiles($this->protocol . "://dir1");
+    $this->assertEquals(array("file2.txt"), $streamFiles3);
+    
+    $unlink1 = unlink($this->protocol . "://dir1/file2.txt");
+    $this->assertTrue($unlink1);
+    
+    $streamFiles4 = $this->_testDirGetFiles($this->protocol . "://dir1");
+    $this->assertEquals(array(), $streamFiles4);
+    
+    $rmdir2 = rmdir($this->protocol . "://dir1");
+    $this->assertTrue($rmdir2);
+
+    $streamFiles5 = $this->_testDirGetFiles($this->protocol . "://");
+    $this->assertEquals(array("file1.txt"), $streamFiles5);
   }
-
+  
   protected function _testDirGetFiles($dir)
   {
     if (is_dir($dir)) {
@@ -67,7 +83,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
         while (($file = readdir($dh)) !== false) {
           $files[] = $file;
         }
-        
+
         rewinddir($dh);
         $filesAfterRewind = array();
         while (($file = readdir($dh)) !== false) {

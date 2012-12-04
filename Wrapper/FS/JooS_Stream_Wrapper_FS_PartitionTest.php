@@ -79,46 +79,65 @@ class JooS_Stream_Wrapper_FS_PartitionTest extends PHPUnit_Framework_TestCase
     unset($fs);
     $this->assertFalse(file_exists($result2Path));
   }
-  
-  public function testGetList() {
+
+  public function testGetList()
+  {
     $path = $this->_getRoot();
     $entity = JooS_Stream_Entity::newInstance($path);
     $fs = new JooS_Stream_Wrapper_FS_Partition($entity);
 
     $list1 = $fs->getList("dir1");
     $this->_checkFilesList($list1, array("file2.txt"));
-    
-    $fs->makeDirectory("dir1/dir2", 0777, 0);
-    
+
+    $dir2 = $fs->makeDirectory("dir1/dir2", 0777, 0);
+
     $list2 = $fs->getList("dir1");
     $this->_checkFilesList($list2, array("dir2", "file2.txt"));
-    
-    $fs->makeDirectory("dir1/dir2/dir3", 0777, 0);
-  
+
+    $dir3 = $fs->makeDirectory("dir1/dir2/dir3", 0777, 0);
+
     $list3 = $fs->getList("dir1/dir2");
     $this->_checkFilesList($list3, array("dir3"));
     
-    /* @todo протестировать список после удаления файлов/каталогов */
+    $rmdir1 = $fs->removeDirectory("dir1/dir2/dir3", 0);
+    $this->assertTrue($rmdir1 instanceof JooS_Stream_Entity_Deleted);
+    $list3_2 = $fs->getList("dir1/dir2");
+    $this->_checkFilesList($list3_2, array());
+
+    $rmdir2 = $fs->removeDirectory("dir1/dir2", 0);
+    $this->assertTrue($rmdir2 instanceof JooS_Stream_Entity_Deleted);
+    $list2_2 = $fs->getList("dir1");
+    $this->_checkFilesList($list2_2, array("file2.txt"));
     
+    $rmdir3 = @$fs->removeDirectory("dir1/file2.txt", STREAM_REPORT_ERRORS);
+    $this->assertEquals(null, $rmdir3);
+
+    $rmdir4 = $fs->removeDirectory("dir1", 0);
+    $this->assertEquals(null, $rmdir4);
+
+    $rmdir5 = $fs->removeDirectory("dir2", 0);
+    $this->assertEquals(null, $rmdir5);
+
     $list4 = $fs->getList("dir2");
     $this->assertTrue(is_null($list4));
   }
-  
-  private function _checkFilesList($list, $files) {
+
+  private function _checkFilesList($list, $files)
+  {
     $listData = array();
     $listExpected = array();
     foreach ($files as $name) {
       $listData[$name] = 1;
       $listExpected[$name] = 0;
     }
-    
+
     $actualFiles = array();
     foreach ($list as $key => $file) {
       $this->assertTrue(is_numeric($key));
       /* $var $file JooS_Stream_Entity_Interface */
       $this->assertTrue($file instanceof JooS_Stream_Entity_Interface);
       $listData[$file->basename()]--;
-      
+
       $actualFiles[] = $file->basename();
     }
     $this->assertEquals($listExpected, $listData);

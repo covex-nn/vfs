@@ -203,7 +203,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    * 
    * @return JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    */
-  protected function subtree($path, &$name, $create = false) {
+  public function subtree($path, &$name, $create = false) {
     $parts = $this->split($path);
     
     $_name = array_shift($parts);

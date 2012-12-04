@@ -34,6 +34,31 @@ interface JooS_Stream_Wrapper_FS_Interface {
   public function mkdir($path, $mode, $options);
   
   /**
+   * Removes a directory
+   *
+   * This method is called in response to rmdir().
+   *
+   * @param string $path    Path
+   * @param int    $options Options
+   * 
+   * @link http://www.php.net/manual/en/streamwrapper.rmdir.php
+   * @return boolean
+   */
+  public function rmdir($path, $options);
+  
+  /**
+   * Delete a file
+   * 
+   * This method is called in response to unlink().
+   * 
+   * @param string $path Path
+   * 
+   * @link http://www.php.net/manual/en/streamwrapper.unlink.php
+   * @return bool
+   */
+  public function unlink($path);
+  
+  /**
    * Open directory handle
    *
    * This method is called in response to opendir().

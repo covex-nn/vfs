@@ -56,6 +56,38 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
     return !!$partition->makeDirectory($path, $mode, $options);
   }
   
+  /**
+   * Removes a directory
+   *
+   * @param string $url     Path
+   * @param int    $options Options
+   * 
+   * @return boolean
+   */
+  public function rmdir($url, $options) {
+    $partition = self::getPartition($url);
+    $path = self::getRelativePath($url);
+    
+    return !!$partition->removeDirectory($path, $options);
+  }
+  
+  /**
+   * Delete a file
+   * 
+   * @param string $url Path
+   * 
+   * @return bool
+   */
+  public function unlink($url) {
+    $partition = self::getPartition($url);
+    $path = self::getRelativePath($url);
+    
+    return !!$partition->deleteFile($path);
+  }
+  
+  /**
+   * @var array
+   */
   private $_dirFiles;
   
   /**
@@ -202,7 +234,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
     $host = parse_url($url, PHP_URL_HOST);
     $path = parse_url($url, PHP_URL_PATH);
     
-    return $host . (strlen($path) ? "/" . $path : "");
+    return $host . $path;
   }
   
   /**

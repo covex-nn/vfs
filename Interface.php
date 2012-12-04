@@ -19,39 +19,19 @@ interface JooS_Stream_Interface
    * right before stream::stream_open().
    * 
    * @link http://www.php.net/manual/en/streamwrapper.construct.php
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function __construct();
 
   /**
    * Renames a file or directory
    *
-   * This method is called in response to rename().
-   *
-   * Should attempt to rename pathFrom to pathTo
-   *
    * @param string $pathFrom Path from
    * @param string $pathTo   Path to
    * 
    * @link http://www.php.net/manual/en/streamwrapper.rename.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function rename($pathFrom, $pathTo);
-
-  /**
-   * Removes a directory
-   *
-   * This method is called in response to rmdir().
-   *
-   * @param string $path    Path
-   * @param int    $options Options
-   * 
-   * @link http://www.php.net/manual/en/streamwrapper.rmdir.php
-   * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
-   */
-  public function rmdir($path, $options);
 
   /**
    * Retrieve the underlaying resources
@@ -62,7 +42,6 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-cast.php
    * @return resource
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_cast($castAs);
 
@@ -76,7 +55,6 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-close.php
    * @return null
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_close();
 
@@ -87,7 +65,6 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-eof.php
    * @return bool
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_eof();
 
@@ -101,7 +78,6 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-flush.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_flush();
 
@@ -116,7 +92,6 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-lock.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_lock($operation);
 
@@ -133,7 +108,6 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-open.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_open($path, $mode, $options, &$openedPath);
 
@@ -146,7 +120,6 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-read.php
    * @return string
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_read($count);
 
@@ -163,7 +136,6 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-seek.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_seek($offset, $whence = SEEK_SET);
 
@@ -182,7 +154,6 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-set-option.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_set_option($option, $argOne, $argTwo);
 
@@ -193,7 +164,6 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-stat.php
    * @return array
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_stat();
 
@@ -204,7 +174,6 @@ interface JooS_Stream_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.stream-tell.php
    * @return int
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_tell();
 
@@ -217,34 +186,7 @@ interface JooS_Stream_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.stream-write.php
    * @return int
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function stream_write($data);
-
-  /**
-   * Delete a file
-   * 
-   * This method is called in response to unlink().
-   * 
-   * @param string $path Path
-   * 
-   * @link http://www.php.net/manual/en/streamwrapper.unlink.php
-   * @return bool
-   * @todo JooS_Stream_Wrapper_FS
-   */
-  public function unlink($path);
-
-  /**
-   * Retrieve information about a file
-   * 
-   * stream::url_stat — Retrieve information about a file
-   *
-   * @param string $path  Path
-   * @param int    $flags Flags
-   * 
-   * @link http://www.php.net/manual/en/streamwrapper.url-stat.php
-   * @return array
-   */
-  public function url_stat($path, $flags);
 
 }

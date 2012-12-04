@@ -8,7 +8,8 @@ require_once "JooS/Stream/Wrapper/FS/Partition/Interface.php";
 /**
  * Filesystem tree.
  * 
- * @todo все функции должны возвращать вместо Storage Entity !!!
+ * @todo нужно очищать subtree после успешного удаления директории
+ * @todo нужно проверять на is_writable !!!
  */
 class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partition_Interface
 {
@@ -192,6 +193,63 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
   }
   
   /**
+   * Remove directory
+   * 
+   * @param string $path    Path to directory
+   * @param int    $options Stream options
+   * 
+   * @return JooS_Stream_Entity_Deleted
+   */
+  public function removeDirectory($path, $options) {
+    
+    $list = $this->getList($path);
+    if (is_null($list)) {
+      $result = null;
+    } elseif (sizeof($list)) {
+      $result = null;
+    } else {
+      $entity = $this->getEntity($path);
+      
+      require_once "JooS/Stream/Entity/Deleted.php";
+
+      $result = JooS_Stream_Entity_Deleted::newInstance($entity);
+      $this->_changesRegister($path, $result);
+    }
+    
+    if (is_null($result) && ($options & STREAM_REPORT_ERRORS)) {
+      trigger_error(
+        "Could not remove directory '$path'", E_WARNING
+      );
+    }
+    
+    return $result;
+  }
+  
+  /**
+   * Delete a file
+   * 
+   * @param string $path Path
+   * 
+   * @return JooS_Stream_Entity_Deleted
+   */
+  public function deleteFile($path) {
+    $entity = $this->getEntity($path);
+    
+    if (is_null($entity)) {
+      $result = null;
+    } elseif (!$entity->file_exists() || !$entity->is_file ()) {
+      $result = null;
+    } else {
+      require_once "JooS/Stream/Entity/Deleted.php";
+
+      $result = JooS_Stream_Entity_Deleted::newInstance($entity);
+      $this->_changesRegister($path, $result);
+    }
+    
+    return $result;
+  }
+  
+  /**
    * Return list of file in path
    * 
    * @param string $path Path
@@ -221,7 +279,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
               continue;
             }
             
-            $changesKey = $path . "/" . $file;
+            $changesKey = ($path ? $path . "/" : "") . $file;
             if (isset($changes[$changesKey])) {
               continue;
             } else {
@@ -250,11 +308,6 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
     return $result;
   }
   
-  public function removeDirectory($path, $options) {
-// STREAM_MKDIR_RECURSIVE
-// if ($options & STREAM_REPORT_ERRORS) {
-  }
-
   /**
    * Register changes in FS
    * 

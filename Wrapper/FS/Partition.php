@@ -165,6 +165,93 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
   }
   
   /**
+   * Return list of file in path
+   * 
+   * @param string $path Path
+   * 
+   * @return array
+   */
+  public function getList($path) {
+    $entity = $this->getEntity($path);
+    
+    if (!is_null($entity) && $entity->file_exists() && $entity->is_dir()) {
+      $files = array();
+      $changes = $this->_changesTree->own($path);
+
+      if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
+        $directory = $this->getRoot();
+        $directoryPath = $directory->path() . "/" . $path;
+        
+        $dh = opendir($directoryPath);
+        if ($dh) {
+          require_once "JooS/Stream/Entity.php";
+          
+          while (true) {
+            $file = readdir($dh);
+            if ($file === false) {
+              break;
+            } elseif ($file == "." || $file == "..") {
+              continue;
+            }
+            
+            $changesKey = ($path ? $path . "/" : "") . $file;
+            if (isset($changes[$changesKey])) {
+              continue;
+            } else {
+              $files[$changesKey] = JooS_Stream_Entity::newInstance($changesKey);
+            }
+          }
+          closedir($dh);
+        }
+      }
+      
+      foreach ($changes as $changesKey => $file) {
+        /* @var $file JooS_Stream_Entity_Interface */
+        if ($file instanceof JooS_Stream_Entity_Deleted_Interface) {
+          unset($changes[$changesKey]);
+        }
+      }
+      
+      $mergedFiles = array_merge($files, $changes);
+      ksort($mergedFiles);
+      
+      $result = array_values($mergedFiles);
+    } else {
+      $result = null;
+    }
+    
+    return $result;
+  }
+  
+  /**
+   * Retrieve information about a file
+   * 
+   * @param string $path  Path to file
+   * @param int    $flags Flags
+   * 
+   * @return array
+   */
+  public function getStat($path, $flags) {
+    $entity = $this->getEntity($path);
+    
+    if (!is_null($entity)) {
+      $path = $entity->path();
+    } else {
+      $path = null;
+    }
+    
+    if (is_null($path)) {
+      $stat = false;
+    } elseif ($flags & STREAM_URL_STAT_QUIET) {
+      $stat = @stat($path);
+    } else {
+      $stat = stat($path);
+    }
+
+    return $stat;
+  }
+  
+  /**
    * Create a directory
    *
    * @param string $path    Path
@@ -294,62 +381,59 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
   }
   
   /**
-   * Return list of file in path
+   * Opens file or URL
+   *
+   * @param string                       $path    Path
+   * @param string                       $mode    Mode
+   * @param int                          $options Options
+   * @param JooS_Stream_Entity_Interface $entity  Opened entity
    * 
-   * @param string $path Path
-   * 
-   * @return array
+   * @return resource
+   * @link http://php.net/manual/en/function.fopen.php
    */
-  public function getList($path) {
+  public function fileOpen($path, $mode, $options, &$entity) {
     $entity = $this->getEntity($path);
     
-    if (!is_null($entity) && $entity->file_exists() && $entity->is_dir()) {
-      $files = array();
-      $changes = $this->_changesTree->own($path);
-
-      if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
-        $directory = $this->getRoot();
-        $directoryPath = $directory->path() . "/" . $path;
-        
-        $dh = opendir($directoryPath);
-        if ($dh) {
-          require_once "JooS/Stream/Entity.php";
+    if (is_null($entity) || !$entity->is_file()) {
+      $fp = null;
+    } else {
+      $fopenWillFail = false;
+      $mode = strtolower($mode);
+      if ($mode != "r") {
+        if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
+          /* @var $entity JooS_Stream_Entity */
+          $tmpPath = $this->_getUniqueFilename();
+          $basename = basename($path);
           
-          while (true) {
-            $file = readdir($dh);
-            if ($file === false) {
-              break;
-            } elseif ($file == "." || $file == "..") {
-              continue;
-            }
-            
-            $changesKey = ($path ? $path . "/" : "") . $file;
-            if (isset($changes[$changesKey])) {
-              continue;
+          if ($entity->file_exists()) {
+            if ($mode == "x" || $mode == "x+") {
+              $fopenWillFail = true;
             } else {
-              $files[$changesKey] = JooS_Stream_Entity::newInstance($changesKey);
+              copy($entity->path(), $tmpPath);
+              
+              require_once "JooS/Stream/Entity/Virtual.php";
+
+              $entity = JooS_Stream_Entity_Virtual::newInstance(
+                $entity, $tmpPath, $basename
+              );
+              $this->_changesRegister($path, $entity);
             }
           }
-          closedir($dh);
         }
       }
       
-      foreach ($changes as $changesKey => $file) {
-        /* @var $file JooS_Stream_Entity_Interface */
-        if ($file instanceof JooS_Stream_Entity_Deleted_Interface) {
-          unset($changes[$changesKey]);
+      if ($fopenWillFail) {
+        $entity = null;
+      } else {
+        if ($options & STREAM_REPORT_ERRORS) {
+          $fp = fopen($entity->path(), $mode);
+        } else {
+          $fp = @fopen($entity->path(), $mode);
         }
       }
-      
-      $mergedFiles = array_merge($files, $changes);
-      ksort($mergedFiles);
-      
-      $result = array_values($mergedFiles);
-    } else {
-      $result = null;
     }
-    
-    return $result;
+
+    return $fp;
   }
   
   /**

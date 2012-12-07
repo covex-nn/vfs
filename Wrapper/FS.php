@@ -20,24 +20,12 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return array
    */
-  public function url_stat($url, $flags) {
-    $entity = $this->getEntity($url);
+  public function url_stat($url, $flags)
+  {
+    $partition = self::getPartition($url);
+    $path = self::getRelativePath($url);
     
-    if (!is_null($entity)) {
-      $path = $entity->path();
-    } else {
-      $path = null;
-    }
-    
-    if (is_null($path)) {
-      $stat = false;
-    } elseif ($flags & STREAM_URL_STAT_QUIET) {
-      $stat = @stat($path);
-    } else {
-      $stat = stat($path);
-    }
-
-    return $stat;
+    return $partition->getStat($path, $flags);
   }
 
   /**
@@ -49,7 +37,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return boolean
    */
-  public function mkdir($url, $mode, $options) {
+  public function mkdir($url, $mode, $options)
+  {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
     
@@ -64,7 +53,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return boolean
    */
-  public function rmdir($url, $options) {
+  public function rmdir($url, $options)
+  {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
     
@@ -78,7 +68,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return bool
    */
-  public function unlink($url) {
+  public function unlink($url)
+  {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
     
@@ -93,7 +84,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return boolean
    */
-  public function rename($srcPath, $dstPath) {
+  public function rename($srcPath, $dstPath)
+  {
     $srcPartition = self::getPartition($srcPath);
     $dstPartition = self::getPartition($dstPath);
     
@@ -120,7 +112,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return boolean
    */
-  public function dir_opendir($url, $options) {
+  public function dir_opendir($url, $options)
+  {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
     
@@ -145,7 +138,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    *
    * @return string
    */
-  public function dir_readdir() {
+  public function dir_readdir()
+  {
     $each = each($this->_dirFiles);
     
     if ($each === false) {
@@ -162,7 +156,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    *
    * @return boolean
    */
-  public function dir_closedir() {
+  public function dir_closedir()
+  {
     unset($this->_dirFiles);
     
     return true;
@@ -173,10 +168,144 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    *
    * @return boolean
    */
-  public function dir_rewinddir() {
+  public function dir_rewinddir()
+  {
     reset($this->_dirFiles);
     
     return true;
+  }
+
+  /**
+   * @var resource
+   */
+  private $_filePointer;
+  
+  /**
+   * @var JooS_Stream_Entity_Interface
+   */
+  private $_fileEntity;
+  
+  public function __construct()
+  {
+    $this->_filePointer = null;
+    $this->_fileEntity = null;
+  }
+  
+  /**
+   * Opens file or URL
+   *
+   * @param string $url         Path
+   * @param string $mode        Mode
+   * @param int    $options     Options
+   * @param string &$openedPath Opened Path
+   * 
+   * @return boolean
+   */
+  public function stream_open($url, $mode, $options, &$openedPath)
+  {
+    $partition = self::getPartition($url);
+    $path = self::getRelativePath($url);
+    
+    $this->_filePointer = $partition->fileOpen($path, $mode, $options, $this->_fileEntity);
+    
+    $result = !!$this->_filePointer;
+    if ($result && ($options & STREAM_USE_PATH)) {
+      $openedPath = $path;
+    }
+    return $result;
+  }
+  
+  /**
+   * Close an resource
+   *
+   * This method is called in response to fclose().
+   *
+   * All resources that were locked, or allocated, by the wrapper
+   * should be released.
+   *
+   * @link http://www.php.net/manual/en/streamwrapper.stream-close.php
+   * @return null
+   */
+  public function stream_close()
+  {
+    fclose($this->_filePointer);
+  }
+
+  /**
+   * Read from stream
+   * 
+   * @param int $count Count
+   * 
+   * @return string
+   */
+  public function stream_read($count)
+  {
+    return fread($this->_filePointer, $count);
+  }
+  
+  /**
+   * Retrieve information about a file resource
+   * 
+   * @return array
+   */
+  public function stream_stat()
+  {
+    return fstat($this->_filePointer);
+  }
+  
+  /**
+   * Tests for end-of-file on a file pointer
+   *
+   * @return boolean
+   */
+  public function stream_eof()
+  {
+    return feof($this->_filePointer);
+  }
+  
+  /**
+   * Retrieve the current position of a stream
+   *
+   * @return int
+   */
+  public function stream_tell()
+  {
+    return ftell($this->_filePointer);
+  }
+  
+  /**
+   * Seeks to specific location in a stream
+   * 
+   * @param int $offset Offset
+   * @param int $whence = SEEK_SET
+   * 
+   * @return boolean
+   */
+  public function stream_seek($offset, $whence = SEEK_SET)
+  {
+    return fseek($this->_filePointer, $offset, $whence);
+  }
+  
+  /**
+   * Write to stream
+   * 
+   * @param string $data Data
+   * 
+   * @return int
+   */
+  public function stream_write($data)
+  {
+    return fwrite($this->_filePointer, $data);
+  }
+  
+  /**
+   * Flushes the output
+   * 
+   * @return boolean
+   */
+  public function stream_flush()
+  {
+    return fflush($this->_filePointer);
   }
   
   /**
@@ -229,7 +358,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * @return JooS_Stream_Wrapper_FS_Partition
    * @throws JooS_Stream_Wrapper_FS_Exception
    */
-  protected static function getPartition($url) {
+  protected static function getPartition($url)
+  {
     $urlParts = explode("://", $url);
     $protocol = $urlParts[0];
     
@@ -252,7 +382,8 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return string
    */
-  public static function getRelativePath($url) {
+  public static function getRelativePath($url)
+  {
     $urlParts = explode("://", $url);
     $urlProtocol = array_shift($urlParts);
     $urlPath = implode("://", $urlParts);
@@ -277,18 +408,4 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
     return $host . rtrim($path, "/");
   }
   
-  /**
-   * Return entity by url
-   * 
-   * @param string $url
-   * 
-   * @return JooS_Stream_Entity_Interface
-   */
-  protected static function getEntity($url) {
-    $partition = self::getPartition($url);
-    $relativePath = self::getRelativePath($url);
-    
-    return $partition->getEntity($relativePath);
-  }
-
 }

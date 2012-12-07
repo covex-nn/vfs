@@ -14,6 +14,24 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     );
   }
 
+  /**
+   * @dataProvider providerGetRelativePath
+   */
+  public function testGetRelativePath($url)
+  {
+    $this->assertEquals("dir1/dir2", JooS_Stream_Wrapper_FS::getRelativePath($url));
+  }
+
+  public function providerGetRelativePath()
+  {
+    return array(
+      array('test://dir1/dir2/'),
+      array('test:///dir1//dir2'),
+      array('test://\dir1\dir2'),
+      array('test://\\dir1\\dir2'),
+    );
+  }
+
   public function testStat()
   {
     $realDir = $this->_getFsRoot();
@@ -46,33 +64,37 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(null, $streamFiles0);
 
     $streamFiles1 = $this->_testDirGetFiles($this->protocol . "://dir1");
-    $this->assertEquals(array("file2.txt"), $streamFiles1);
+    $this->assertEquals(array("dir5", "file2.txt"), $streamFiles1);
 
     $mkdir1 = mkdir($this->protocol . "://dir1/dir2");
     $this->assertTrue($mkdir1);
 
     $streamFiles2 = $this->_testDirGetFiles($this->protocol . "://dir1");
-    $this->assertEquals(array("dir2", "file2.txt"), $streamFiles2);
-    
+    $this->assertEquals(array("dir2", "dir5", "file2.txt"), $streamFiles2);
+
     $rmdir1 = rmdir($this->protocol . "://dir1/dir2");
     $this->assertTrue($rmdir1);
-    
+
     $streamFiles3 = $this->_testDirGetFiles($this->protocol . "://dir1");
-    $this->assertEquals(array("file2.txt"), $streamFiles3);
-    
+    $this->assertEquals(array("dir5", "file2.txt"), $streamFiles3);
+
     $unlink1 = unlink($this->protocol . "://dir1/file2.txt");
     $this->assertTrue($unlink1);
-    
+    $unlink2 = unlink($this->protocol . "://dir1/dir5/file5.txt");
+    $this->assertTrue($unlink2);
+    $rmdir5 = rmdir($this->protocol . "://dir1/dir5");
+    $this->assertTrue($rmdir5);
+
     $streamFiles4 = $this->_testDirGetFiles($this->protocol . "://dir1");
     $this->assertEquals(array(), $streamFiles4);
-    
+
     $rmdir2 = rmdir($this->protocol . "://dir1");
     $this->assertTrue($rmdir2);
 
     $streamFiles5 = $this->_testDirGetFiles($this->protocol . "://");
     $this->assertEquals(array("file1.txt"), $streamFiles5);
   }
-  
+
   protected function _testDirGetFiles($dir)
   {
     if (is_dir($dir)) {

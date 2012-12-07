@@ -121,6 +121,27 @@ class JooS_Stream_Wrapper_FS_PartitionTest extends PHPUnit_Framework_TestCase
     $list4 = $fs->getList("dir2");
     $this->assertTrue(is_null($list4));
   }
+  
+  public function testRename() {
+    $path = $this->_getRoot();
+    $root = JooS_Stream_Entity::newInstance($path);
+    $fs = new JooS_Stream_Wrapper_FS_Partition($root);
+    
+    $rename1 = $fs->rename("file1.txt", "dir1/file3.txt");
+    $this->assertTrue($rename1 instanceof JooS_Stream_Entity_Virtual);
+    $this->assertEquals("file3.txt", $rename1->basename());
+
+    $list1 = $fs->getList("dir1");
+    $this->_checkFilesList($list1, array("file2.txt", "file3.txt"));
+    $entity1 = $fs->getEntity("file1.txt");
+    $this->assertFalse($entity1->file_exists());
+    
+    $delete1 = $fs->deleteFile("dir1/file2.txt");
+    $this->assertTrue($delete1 instanceof JooS_Stream_Entity_Deleted);
+    
+    $list2 = $fs->getList("dir1");
+    $this->_checkFilesList($list2, array("file3.txt"));
+  }
 
   private function _checkFilesList($list, $files)
   {

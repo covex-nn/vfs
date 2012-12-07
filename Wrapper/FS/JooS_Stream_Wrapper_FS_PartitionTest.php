@@ -98,7 +98,7 @@ class JooS_Stream_Wrapper_FS_PartitionTest extends PHPUnit_Framework_TestCase
 
     $list3 = $fs->getList("dir1/dir2");
     $this->_checkFilesList($list3, array("dir3"));
-    
+
     $rmdir1 = $fs->removeDirectory("dir1/dir2/dir3", 0);
     $this->assertTrue($rmdir1 instanceof JooS_Stream_Entity_Deleted);
     $list3_2 = $fs->getList("dir1/dir2");
@@ -108,7 +108,7 @@ class JooS_Stream_Wrapper_FS_PartitionTest extends PHPUnit_Framework_TestCase
     $this->assertTrue($rmdir2 instanceof JooS_Stream_Entity_Deleted);
     $list2_2 = $fs->getList("dir1");
     $this->_checkFilesList($list2_2, array("file2.txt"));
-    
+
     $rmdir3 = @$fs->removeDirectory("dir1/file2.txt", STREAM_REPORT_ERRORS);
     $this->assertEquals(null, $rmdir3);
 
@@ -121,12 +121,13 @@ class JooS_Stream_Wrapper_FS_PartitionTest extends PHPUnit_Framework_TestCase
     $list4 = $fs->getList("dir2");
     $this->assertTrue(is_null($list4));
   }
-  
-  public function testRename() {
+
+  public function testRename()
+  {
     $path = $this->_getRoot();
     $root = JooS_Stream_Entity::newInstance($path);
     $fs = new JooS_Stream_Wrapper_FS_Partition($root);
-    
+
     $rename1 = $fs->rename("file1.txt", "dir1/file3.txt");
     $this->assertTrue($rename1 instanceof JooS_Stream_Entity_Virtual);
     $this->assertEquals("file3.txt", $rename1->basename());
@@ -135,14 +136,57 @@ class JooS_Stream_Wrapper_FS_PartitionTest extends PHPUnit_Framework_TestCase
     $this->_checkFilesList($list1, array("file2.txt", "file3.txt"));
     $entity1 = $fs->getEntity("file1.txt");
     $this->assertFalse($entity1->file_exists());
-    
+
     $delete1 = $fs->deleteFile("dir1/file2.txt");
     $this->assertTrue($delete1 instanceof JooS_Stream_Entity_Deleted);
-    
+
     $list2 = $fs->getList("dir1");
     $this->_checkFilesList($list2, array("file3.txt"));
   }
+  
+  public function testFileOpen() {
+    $path = $this->_getRoot();
+    $root = JooS_Stream_Entity::newInstance($path);
+    $fs = new JooS_Stream_Wrapper_FS_Partition($root);
+    
+    $entity1 = null;
+    $fp1 = $fs->fileOpen("file1.txt", "r", STREAM_REPORT_ERRORS, $entity1);
+    $this->assertTrue(is_resource($fp1));
+    $this->assertTrue($entity1 instanceof JooS_Stream_Entity);
+    
+    $this->assertEquals("file1", $this->_readFromFilePointer($fp1));
+    fclose($fp1);
+    
+    $entity2 = null;
+    $fp2 = $fs->fileOpen("file1.txt", "w", 0, $entity2);
+    $this->assertTrue(is_resource($fp2));
+    $this->assertTrue($entity2 instanceof JooS_Stream_Entity_Virtual);
+    
+    fputs($fp2, "qwerty");
+    fclose($fp2);
+    
+    $entity3 = null;
+    $fp3 = $fs->fileOpen("file1.txt", "r", 0, $entity3);
+    $this->assertTrue(is_resource($fp3));
+    $this->assertTrue($entity3 instanceof JooS_Stream_Entity_Virtual);
+    
+    $this->assertEquals("qwerty", $this->_readFromFilePointer($fp3));
+    fclose($fp3);
+    
+    $this->assertEquals("file1", file_get_contents($path . "/file1.txt"));
+  }
 
+  private function _readFromFilePointer($fp) {
+    $result = "";
+    while (!feof($fp)) {
+      $buffer = fgets($fp, 4096);
+      if ($buffer !== false) {
+        $result .= $buffer;
+      }
+    }
+    return $result;
+  }
+  
   private function _checkFilesList($list, $files)
   {
     $listData = array();

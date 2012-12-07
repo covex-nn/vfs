@@ -10,7 +10,8 @@ require_once "JooS/Stream/Wrapper/FS/Partition/Interface.php";
  * 
  * @todo нужно проверять на is_writable !!!
  */
-class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partition_Interface
+class JooS_Stream_Wrapper_FS_Partition
+  implements JooS_Stream_Wrapper_FS_Partition_Interface
 {
   
   /**
@@ -47,6 +48,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
   }
   
   /**
+   * Destructor
+   * 
    * @see http://www.refreshinglyblue.com/2008/11/26/recursively-delete-a-non-empty-directory-with-php5/
    */
   public function __destruct()
@@ -73,7 +76,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return JooS_Stream_Entity
    */
-  public function getRoot() {
+  public function getRoot()
+  {
     return $this->_root;
   }
 
@@ -85,9 +89,9 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * @return null
    * @throws JooS_Stream_Wrapper_FS_Exception
    */
-  protected function setRoot(JooS_Stream_Entity_Interface $entity) {
-    if (!$entity->file_exists() || !$entity->is_dir())
-    {
+  protected function setRoot(JooS_Stream_Entity_Interface $entity)
+  {
+    if (!$entity->file_exists() || !$entity->is_dir()) {
       require_once "JooS/Stream/Wrapper/FS/Exception.php";
       
       throw new JooS_Stream_Wrapper_FS_Exception(
@@ -106,7 +110,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * @return JooS_Stream_Entity_Interface
    * @throws JooS_Stream_Wrapper_FS_Exception
    */
-  public function getEntity($filename) {
+  public function getEntity($filename)
+  {
     $unixFilename = str_replace("\\", "/", $filename);
     while (strpos($unixFilename, "//") !== false) {
       $unixFilename = str_replace("//", "/", $filename);
@@ -171,7 +176,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return array
    */
-  public function getList($path) {
+  public function getList($path)
+  {
     $entity = $this->getEntity($path);
     
     if (!is_null($entity) && $entity->file_exists() && $entity->is_dir()) {
@@ -231,7 +237,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return array
    */
-  public function getStat($path, $flags) {
+  public function getStat($path, $flags)
+  {
     $entity = $this->getEntity($path);
     
     if (!is_null($entity)) {
@@ -260,7 +267,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return JooS_Stream_Entity_Interface
    */
-  public function makeDirectory($path, $mode, $options) {
+  public function makeDirectory($path, $mode, $options)
+  {
     $result = null;
     
     $entity = $this->getEntity($path);
@@ -294,8 +302,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return JooS_Stream_Entity_Deleted
    */
-  public function removeDirectory($path, $options) {
-    
+  public function removeDirectory($path, $options)
+  {
     $list = $this->getList($path);
     if (is_null($list)) {
       $result = null;
@@ -326,12 +334,13 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return JooS_Stream_Entity_Deleted
    */
-  public function deleteFile($path) {
+  public function deleteFile($path)
+  {
     $entity = $this->getEntity($path);
     
     if (is_null($entity)) {
       $result = null;
-    } elseif (!$entity->file_exists() || !$entity->is_file ()) {
+    } elseif (!$entity->file_exists() || !$entity->is_file()) {
       $result = null;
     } else {
       require_once "JooS/Stream/Entity/Deleted.php";
@@ -347,11 +356,12 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * Renames a file or directory
    * 
    * @param string $srcPath Source path
-   * @param string $dstPath   Destination path
+   * @param string $dstPath Destination path
    * 
    * @return JooS_Stream_Entity_Virtual
    */
-  public function rename($srcPath, $dstPath) {
+  public function rename($srcPath, $dstPath)
+  {
     $srcEntity = $this->getEntity($srcPath);
     $dstEntity = $this->getEntity($dstPath);
     
@@ -383,15 +393,16 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
   /**
    * Opens file or URL
    *
-   * @param string                       $path    Path
-   * @param string                       $mode    Mode
-   * @param int                          $options Options
-   * @param JooS_Stream_Entity_Interface $entity  Opened entity
+   * @param string                       $path     Path
+   * @param string                       $mode     Mode
+   * @param int                          $options  Options
+   * @param JooS_Stream_Entity_Interface &$entity  Opened entity
    * 
    * @return resource
    * @link http://php.net/manual/en/function.fopen.php
    */
-  public function fileOpen($path, $mode, $options, &$entity) {
+  public function fileOpen($path, $mode, $options, &$entity)
+  {
     $entity = $this->getEntity($path);
     
     if (is_null($entity) || !$entity->is_file()) {
@@ -444,7 +455,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return null
    */
-  protected function _changesRegister($path, JooS_Stream_Entity_Interface $entity) {
+  protected function _changesRegister($path, JooS_Stream_Entity_Interface $entity)
+  {
     $this->_changesLinear->add($path, $entity);
     $this->_changesTree->add($path, $entity);
   }
@@ -452,9 +464,12 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
   /**
    * Creates directory in sys_get_temp_dir()
    * 
+   * @param int $mode Mode
+   * 
    * @return string
    */
-  protected function _makeDirectory($mode) {
+  protected function _makeDirectory($mode)
+  {
     $name = $this->_getUniqueFilename();
     mkdir($name, $mode);
     
@@ -468,7 +483,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    *
    * @return string
    */
-  protected function _getUniqueFilename() {
+  protected function _getUniqueFilename()
+  {
     $sysTempDir = $this->_getSystemTempDirectory();
     do {
       $this->_uniqueFilenameCounter++;
@@ -490,7 +506,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    * 
    * @return string
    */
-  protected function _getSystemTempDirectory($create = true) {
+  protected function _getSystemTempDirectory($create = true)
+  {
     if (is_null($this->_systemTempDirectory) && $create) {
       $sysTmpDir = rtrim(sys_get_temp_dir(), "\\/");
       /**

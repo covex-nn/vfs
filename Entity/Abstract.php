@@ -59,7 +59,8 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
    * 
    * @return null
    */
-  protected function _setBasename($basename) {
+  protected function _setBasename($basename)
+  {
     $this->_basename = $basename;
   }
   

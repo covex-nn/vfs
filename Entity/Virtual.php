@@ -28,7 +28,8 @@ class JooS_Stream_Entity_Virtual  extends JooS_Stream_Entity_Abstract
    * 
    * @return JooS_Stream_Entity_Virtual
    */
-  public static function newInstance(JooS_Stream_Entity_Interface $realEntity, $path, $basename = null) {
+  public static function newInstance(JooS_Stream_Entity_Interface $realEntity, $path, $basename = null)
+  {
     if (is_null($basename)) {
       $basename = $realEntity->basename();
     }
@@ -44,7 +45,8 @@ class JooS_Stream_Entity_Virtual  extends JooS_Stream_Entity_Abstract
    * 
    * @return JooS_Stream_Entity_Interface
    */
-  public function getRealEntity() {
+  public function getRealEntity()
+  {
     return $this->_realEntity;
   }
   

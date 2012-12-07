@@ -26,7 +26,8 @@ class JooS_Stream_Entity_Deleted extends JooS_Stream_Entity_Abstract
    * 
    * @return JooS_Stream_Entity_Deleted
    */
-  public static function newInstance(JooS_Stream_Entity_Interface $realEntity) {
+  public static function newInstance(JooS_Stream_Entity_Interface $realEntity)
+  {
     $basename = $realEntity->basename();
     $path = $realEntity->path();
     
@@ -42,7 +43,8 @@ class JooS_Stream_Entity_Deleted extends JooS_Stream_Entity_Abstract
    * 
    * @return JooS_Stream_Entity_Interface
    */
-  public function getRealEntity() {
+  public function getRealEntity()
+  {
     return $this->_realEntity;
   }
   

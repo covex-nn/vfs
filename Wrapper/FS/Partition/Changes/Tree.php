@@ -21,6 +21,9 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    */
   private $_subTrees;
   
+  /**
+   * Constructor
+   */
   public function __construct()
   {
     $this->_ownData = array();
@@ -121,11 +124,20 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    * 
    * @return int
    */
-  public function count() {
+  public function count()
+  {
     return sizeof($this->_ownData) + sizeof($this->_subTrees);
   }
   
-  public function own($path = "") {
+  /**
+   * Return subtree's own changes
+   * 
+   * @param string $path Path
+   * 
+   * @return array
+   */
+  public function own($path = "")
+  {
     if ($path) {
       $parts = $this->split($path);
       $name = array_shift($parts);
@@ -138,8 +150,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
           $own, $name, $subtree->own($parts)
         );
       }
-    }
-    else {
+    } else {
       $own = $this->_ownData;
     }
     return $own;
@@ -152,7 +163,8 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    * 
    * @return array
    */
-  public function children($path = "") {
+  public function children($path = "")
+  {
     if ($path) {
       $parts = $this->split($path);
       $name = array_shift($parts);
@@ -181,13 +193,14 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
   /**
    * Add new children to array
    * 
-   * @param array  $children  Children array
-   * @param string $name      Current name
-   * @param array  $_children Children of subtrees
+   * @param array  &$children  Children array
+   * @param string $name       Current name
+   * @param array  $_children  Children of subtrees
    * 
    * @return null
    */
-  private function _appendChildren(array &$children, $name, array $_children) {
+  private function _appendChildren(array &$children, $name, array $_children)
+  {
     foreach ($_children as $key => $value) {
       $children[$name . "/" . $key] = $value;
     }
@@ -202,7 +215,8 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    * 
    * @return JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    */
-  public function subtree($path, &$name, $create = false) {
+  public function subtree($path, &$name, $create = false)
+  {
     $parts = $this->split($path);
     
     $_name = array_shift($parts);
@@ -233,7 +247,8 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
    * 
    * @return array
    */
-  protected function split($path) {
+  protected function split($path)
+  {
     if (is_array($path)) {
       $parts = $path;
     } else {

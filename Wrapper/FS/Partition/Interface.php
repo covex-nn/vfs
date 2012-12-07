@@ -7,7 +7,8 @@
 /**
  * Partition interface
  */
-interface JooS_Stream_Wrapper_FS_Partition_Interface {
+interface JooS_Stream_Wrapper_FS_Partition_Interface
+{
   /**
    * Create a directory
    *

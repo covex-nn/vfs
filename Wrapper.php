@@ -19,7 +19,7 @@ abstract class JooS_Stream_Wrapper
    * Register stream wrapper
    * 
    * @param string $protocol Protocol name
-   * @param int $flags Should be set to STREAM_IS_URL if protocol is a URL protocol
+   * @param int    $flags    STREAM_IS_URL if protocol is a URL protocol, or 0
    * 
    * @throws JooS_Stream_Wrapper_Exception
    * @return boolean

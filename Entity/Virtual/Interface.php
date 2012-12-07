@@ -7,7 +7,8 @@
 /**
  * Interface for virtual stream entities
  */
-interface JooS_Stream_Entity_Virtual_Interface {
+interface JooS_Stream_Entity_Virtual_Interface
+{
   /**
    * Return saved old entity
    * 

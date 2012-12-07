@@ -7,7 +7,8 @@
 /**
  * FS stream wrapper interface
  */
-interface JooS_Stream_Wrapper_FS_Interface {
+interface JooS_Stream_Wrapper_FS_Interface
+{
   /**
    * Retrieve information about a file
    *

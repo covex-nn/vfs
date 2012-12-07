@@ -9,13 +9,17 @@ require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Interface.php";
  * Partition changes, linear data.
  */
 class JooS_Stream_Wrapper_FS_Partition_Changes_Linear
-  implements JooS_Stream_Wrapper_FS_Partition_Changes_Interface {
+  implements JooS_Stream_Wrapper_FS_Partition_Changes_Interface
+{
   
   /**
    * @var array
    */
   private $_data;
   
+  /**
+   * Constructor
+   */
   public function __construct()
   {
     $this->_data = array();

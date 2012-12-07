@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<project>
+  <property name="required.dir" value="external" />
+  <property name="required.path" value="${HOME_DIR}/${required.dir}" />
+  
+  <target name="required-download">
+    <mkdir dir="${required.path}" />
+    
+    <mkdir dir="${required.path}/${repo.dir}" />
+    
+    <antcall target="git-pull">
+      <param name="git.dir" value="${required.path}/${repo.dir}" />
+      <param name="git.repository" value="${repo.url}" />
+      <param name="git.branch" value="master" />
+    </antcall>
+    <ant antfile="${required.path}/${repo.dir}/build/build.ant" target="init" inheritAll="false" inheritRefs="false">
+      <property name="required.path" value="${required.path}" />
+      <property file="${basedir}/${repo.dir}.local.properties" />
+      <property file="${basedir}/${repo.dir}.properties" />
+    </ant>
+  </target>
+</project>

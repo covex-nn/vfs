@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+    <!-- ant-contrib v1.0b3, http://ant-contrib.sourceforge.net/ -->
+		<classpath>
+			<pathelement location="${lib.path.contrib}/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+  
+  <property name="HOME_DIR_tmp" location="${basedir}/.." />
+  <propertyregex property="HOME_DIR" input="${HOME_DIR_tmp}" regexp="\\" replace="/" global="true" defaultValue="${HOME_DIR_tmp}" />
+</project>

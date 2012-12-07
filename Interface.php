@@ -23,17 +23,6 @@ interface JooS_Stream_Interface
   public function __construct();
 
   /**
-   * Renames a file or directory
-   *
-   * @param string $pathFrom Path from
-   * @param string $pathTo   Path to
-   * 
-   * @link http://www.php.net/manual/en/streamwrapper.rename.php
-   * @return boolean
-   */
-  public function rename($pathFrom, $pathTo);
-
-  /**
    * Retrieve the underlaying resources
    * 
    * This method is called in response to stream_select(). 
@@ -175,6 +164,7 @@ interface JooS_Stream_Interface
    * @link http://www.php.net/manual/en/streamwrapper.stream-tell.php
    * @return int
    */
+  
   public function stream_tell();
 
   /**

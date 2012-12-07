@@ -62,10 +62,9 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
     if (strlen($path)) {
       $name = null;
       $subtree = $this->subtree($path, $name, true);
-      if (!isset($subtree->_ownData[$name])) {
-        $subtree->_ownData[$name] = $entity;
-        $result = true;
-      }
+      $subtree->_ownData[$name] = $entity;
+      
+      $result = true;
     }
     
     return $result;
@@ -212,11 +211,12 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
       $subtree = $this;
     } else {
       
-      if (!isset($this->_subTrees[$_name]) && !$create) {
+      $exists = isset($this->_subTrees[$_name]);
+      if (!$exists && !$create) {
         $subtree = null;
         $name = null;
       } else {
-        if ($create) {
+        if (!$exists && $create) {
           $this->_subTrees[$_name] = new self();
         }
         $subtree = $this->_subTrees[$_name]->subtree($parts, $name, $create);

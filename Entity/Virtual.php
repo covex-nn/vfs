@@ -24,12 +24,14 @@ class JooS_Stream_Entity_Virtual  extends JooS_Stream_Entity_Abstract
    * 
    * @param JooS_Stream_Entity_Interface $realEntity Real stream entity
    * @param string                       $path       Tmp path
+   * @param string                       $basename   Optional basename
    * 
    * @return JooS_Stream_Entity_Virtual
    */
-  public static function newInstance(JooS_Stream_Entity_Interface $realEntity, $path) {
-    
-    $basename = $realEntity->basename();
+  public static function newInstance(JooS_Stream_Entity_Interface $realEntity, $path, $basename = null) {
+    if (is_null($basename)) {
+      $basename = $realEntity->basename();
+    }
     $instance = new static($basename, $path);
     /* @var $instance JooS_Stream_Entity_Virtual */
     $instance->_realEntity = $realEntity;

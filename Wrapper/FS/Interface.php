@@ -59,6 +59,17 @@ interface JooS_Stream_Wrapper_FS_Interface {
   public function unlink($path);
   
   /**
+   * Renames a file or directory
+   *
+   * @param string $pathFrom Path from
+   * @param string $pathTo   Path to
+   * 
+   * @link http://www.php.net/manual/en/streamwrapper.rename.php
+   * @return boolean
+   */
+  public function rename($pathFrom, $pathTo);
+  
+  /**
    * Open directory handle
    *
    * This method is called in response to opendir().

@@ -8,7 +8,6 @@ require_once "JooS/Stream/Wrapper/FS/Partition/Interface.php";
 /**
  * Filesystem tree.
  * 
- * @todo нужно очищать subtree после успешного удаления директории
  * @todo нужно проверять на is_writable !!!
  */
 class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partition_Interface
@@ -109,6 +108,9 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
    */
   public function getEntity($filename) {
     $unixFilename = str_replace("\\", "/", $filename);
+    while (strpos($unixFilename, "//") !== false) {
+      $unixFilename = str_replace("//", "/", $filename);
+    }
     $parts = explode(
       "/", trim($unixFilename, "/")
     );
@@ -121,7 +123,12 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
 
     foreach ($parts as $name) {
       $filepath .= ($filepath ? "/" : "") . $name;
-      $partiallyFilepath = ($partiallyFilepath ? "/" : "") . $name;
+      
+      if ($partiallyFilepath) {
+        $partiallyFilepath = $partiallyFilepath . "/" . $name;
+      } else {
+        $partiallyFilepath = $name;
+      }
       
       $changesExists = $this->_changesLinear->exists($filepath);
       if ($changesExists || $changesStage) {
@@ -185,7 +192,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
     
     if (is_null($result) && ($options & STREAM_REPORT_ERRORS)) {
       trigger_error(
-        "Could not create directory '$path'", E_WARNING
+        "Could not create directory '$path'", E_USER_WARNING
       );
     }
     
@@ -218,7 +225,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
     
     if (is_null($result) && ($options & STREAM_REPORT_ERRORS)) {
       trigger_error(
-        "Could not remove directory '$path'", E_WARNING
+        "Could not remove directory '$path'", E_USER_WARNING
       );
     }
     
@@ -244,6 +251,43 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Stream_Wrapper_FS_Partiti
 
       $result = JooS_Stream_Entity_Deleted::newInstance($entity);
       $this->_changesRegister($path, $result);
+    }
+    
+    return $result;
+  }
+  
+  /**
+   * Renames a file or directory
+   * 
+   * @param string $srcPath Source path
+   * @param string $dstPath   Destination path
+   * 
+   * @return JooS_Stream_Entity_Virtual
+   */
+  public function rename($srcPath, $dstPath) {
+    $srcEntity = $this->getEntity($srcPath);
+    $dstEntity = $this->getEntity($dstPath);
+    
+    if (is_null($srcEntity) || !$srcEntity->file_exists()) {
+      $result = null;
+    } elseif (is_null($dstEntity) || $dstEntity->file_exists()) {
+      $result = null;
+    } elseif ($srcEntity->is_file()) {
+      require_once "JooS/Stream/Entity/Virtual.php";
+      
+      $dstFile = JooS_Stream_Entity_Virtual::newInstance(
+        $srcEntity, $srcEntity->path(), $dstEntity->basename()
+      );
+      $this->_changesRegister($dstPath, $dstFile);
+      
+      require_once "JooS/Stream/Entity/Deleted.php";
+      
+      $srcFile = JooS_Stream_Entity_Deleted::newInstance($srcEntity);
+      $this->_changesRegister($srcPath, $srcFile);
+      
+      $result = $dstFile;
+    } else {
+      $result = null;
     }
     
     return $result;

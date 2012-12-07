@@ -86,6 +86,28 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
   }
   
   /**
+   * Renames a file or directory
+   *
+   * @param string $srcPath Source path
+   * @param string $dstPath Destination path
+   * 
+   * @return boolean
+   */
+  public function rename($srcPath, $dstPath) {
+    $srcPartition = self::getPartition($srcPath);
+    $dstPartition = self::getPartition($dstPath);
+    
+    if ($srcPartition != $dstPartition) {
+      return false;
+    }
+    
+    $srcRelativePath = self::getRelativePath($srcPath);
+    $dstRelativePath = self::getRelativePath($dstPath);
+    
+    return !!$srcPartition->rename($srcRelativePath, $dstRelativePath);
+  }
+  
+  /**
    * @var array
    */
   private $_dirFiles;
@@ -172,7 +194,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    */
   public static function register($protocol, $root)
   {
-    $result = parent::register($protocol, 0);
+    $result = parent::register($protocol, STREAM_IS_URL);
     if ($result) {
       require_once "JooS/Stream/Entity.php";
 
@@ -230,11 +252,29 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper implements JooS_Stream_
    * 
    * @return string
    */
-  protected static function getRelativePath($url) {
-    $host = parse_url($url, PHP_URL_HOST);
-    $path = parse_url($url, PHP_URL_PATH);
+  public static function getRelativePath($url) {
+    $urlParts = explode("://", $url);
+    $urlProtocol = array_shift($urlParts);
+    $urlPath = implode("://", $urlParts);
     
-    return $host . $path;
+    if (strpos($urlPath, "\\") !== false) {
+      $urlPath = str_replace("\\", "/", $urlPath);
+    }
+    while (strpos($urlPath, "//") !== false) {
+      $urlPath = str_replace("//", "/", $urlPath);
+    }
+    if (strlen($urlPath)) {
+      if (substr($urlPath, 0, 1) == "/") {
+        $urlPath = trim($urlPath, "/");
+      }
+    }
+    
+    $fixedUrl = $urlProtocol . "://" . $urlPath;
+    
+    $host = parse_url($fixedUrl, PHP_URL_HOST);
+    $path = parse_url($fixedUrl, PHP_URL_PATH);
+    
+    return $host . rtrim($path, "/");
   }
   
   /**

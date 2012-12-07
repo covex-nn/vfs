@@ -47,13 +47,9 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Linear
    */
   public function add($path, JooS_Stream_Entity_Interface $entity)
   {
-    $result = false;
-    if (!$this->exists($path)) {
-      $this->_data[$path] = $entity;
-      
-      $result = true;
-    }
-    return $result;
+    $this->_data[$path] = $entity;
+
+    return true;
   }
   
   /**

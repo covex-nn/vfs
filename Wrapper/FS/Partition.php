@@ -393,10 +393,10 @@ class JooS_Stream_Wrapper_FS_Partition
   /**
    * Opens file or URL
    *
-   * @param string                       $path     Path
-   * @param string                       $mode     Mode
-   * @param int                          $options  Options
-   * @param JooS_Stream_Entity_Interface &$entity  Opened entity
+   * @param string                       $path    Path
+   * @param string                       $mode    Mode
+   * @param int                          $options Options
+   * @param JooS_Stream_Entity_Interface &$entity Opened entity
    * 
    * @return resource
    * @link http://php.net/manual/en/function.fopen.php

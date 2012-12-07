@@ -193,9 +193,9 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
   /**
    * Add new children to array
    * 
-   * @param array  &$children  Children array
-   * @param string $name       Current name
-   * @param array  $_children  Children of subtrees
+   * @param array  &$children Children array
+   * @param string $name      Current name
+   * @param array  $_children Children of subtrees
    * 
    * @return null
    */

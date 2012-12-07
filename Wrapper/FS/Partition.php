@@ -188,12 +188,12 @@ class JooS_Stream_Wrapper_FS_Partition
         $directory = $this->getRoot();
         $directoryPath = $directory->path() . "/" . $path;
         
-        $dh = opendir($directoryPath);
-        if ($dh) {
+        $dirHandler = opendir($directoryPath);
+        if ($dirHandler) {
           require_once "JooS/Stream/Entity.php";
           
           while (true) {
-            $file = readdir($dh);
+            $file = readdir($dirHandler);
             if ($file === false) {
               break;
             } elseif ($file == "." || $file == "..") {
@@ -207,7 +207,7 @@ class JooS_Stream_Wrapper_FS_Partition
               $files[$changesKey] = JooS_Stream_Entity::newInstance($changesKey);
             }
           }
-          closedir($dh);
+          closedir($dirHandler);
         }
       }
       
@@ -406,7 +406,7 @@ class JooS_Stream_Wrapper_FS_Partition
     $entity = $this->getEntity($path);
     
     if (is_null($entity) || !$entity->is_file()) {
-      $fp = null;
+      $filePointer = null;
     } else {
       $fopenWillFail = false;
       $mode = strtolower($mode);
@@ -437,14 +437,14 @@ class JooS_Stream_Wrapper_FS_Partition
         $entity = null;
       } else {
         if ($options & STREAM_REPORT_ERRORS) {
-          $fp = fopen($entity->path(), $mode);
+          $filePointer = fopen($entity->path(), $mode);
         } else {
-          $fp = @fopen($entity->path(), $mode);
+          $filePointer = @fopen($entity->path(), $mode);
         }
       }
     }
 
-    return $fp;
+    return $filePointer;
   }
   
   /**

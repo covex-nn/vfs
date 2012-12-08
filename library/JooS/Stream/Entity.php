@@ -27,11 +27,12 @@ class JooS_Stream_Entity extends JooS_Stream_Entity_Abstract
   /**
    * Fix slashes and backslashes in path
    * 
-   * @param string $path
+   * @param string $path Path
    * 
    * @return string
    */
-  public static function fixPath($path) {
+  public static function fixPath($path)
+  {
     if (strpos($path, "\\") !== false) {
       $path = str_replace("\\", "/", $path);
     }

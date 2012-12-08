@@ -14,12 +14,12 @@ abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interfa
   /**
    * @var string
    */
-  private $_basename;
+  protected $_basename;
   
   /**
    * @var string
    */
-  private $_path;
+  protected $_path;
 
   /**
    * Protected constructor

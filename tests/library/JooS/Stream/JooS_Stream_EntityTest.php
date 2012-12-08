@@ -5,6 +5,25 @@ require_once "JooS/Stream/Entity.php";
 class JooS_Stream_EntityTest extends PHPUnit_Framework_TestCase
 {
 
+  /**
+   * @dataProvider providerGetRelativePath
+   */
+  public function testFixPath($path)
+  {
+    $this->assertEquals("dir1/dir2", JooS_Stream_Entity::fixPath($path));
+  }
+
+  public function providerGetRelativePath()
+  {
+    return array(
+      array('dir1/dir2/'),
+      array('/dir1//dir2'),
+      array('\dir1\dir2'),
+      array('\\\\dir1\\dir2\\'),
+    );
+  }
+  
+  
   public function testInstance()
   {
     $instance = JooS_Stream_Entity::newInstance(__FILE__);

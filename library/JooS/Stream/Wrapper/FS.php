@@ -368,17 +368,9 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
   protected static function getPartition($url)
   {
     $urlParts = explode("://", $url);
-    $protocol = $urlParts[0];
+    $protocol = array_shift($urlParts);
     
-    if (isset(self::$_partitions[$protocol])) {
-      return self::$_partitions[$protocol];
-    } else {
-      require_once "JooS/Stream/Wrapper/FS/Exception.php";
-      
-      throw new JooS_Stream_Wrapper_FS_Exception(
-        "Working with unregistered stream '$protocol://'"
-      );
-    }
+    return self::$_partitions[$protocol];
   }
   
   /**
@@ -391,27 +383,12 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
   public static function getRelativePath($url)
   {
     $urlParts = explode("://", $url);
-    $urlProtocol = array_shift($urlParts);
+    array_shift($urlParts);
     $urlPath = implode("://", $urlParts);
+
+    require_once "JooS/Stream/Entity.php";
     
-    if (strpos($urlPath, "\\") !== false) {
-      $urlPath = str_replace("\\", "/", $urlPath);
-    }
-    while (strpos($urlPath, "//") !== false) {
-      $urlPath = str_replace("//", "/", $urlPath);
-    }
-    if (strlen($urlPath)) {
-      if (substr($urlPath, 0, 1) == "/") {
-        $urlPath = trim($urlPath, "/");
-      }
-    }
-    
-    $fixedUrl = $urlProtocol . "://" . $urlPath;
-    
-    $host = parse_url($fixedUrl, PHP_URL_HOST);
-    $path = parse_url($fixedUrl, PHP_URL_PATH);
-    
-    return $host . rtrim($path, "/");
+    return JooS_Stream_Entity::fixPath($urlPath);
   }
   
 }

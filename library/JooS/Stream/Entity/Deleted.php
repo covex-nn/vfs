@@ -18,7 +18,7 @@ class JooS_Stream_Entity_Deleted extends JooS_Stream_Entity_Abstract
   /**
    * @var JooS_Stream_Entity_Interface
    */
-  private $_realEntity;
+  protected $_realEntity;
   
   /**
    * Create new virtual stream entity

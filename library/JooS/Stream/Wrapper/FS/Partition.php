@@ -113,13 +113,10 @@ class JooS_Stream_Wrapper_FS_Partition
    */
   public function getEntity($filename)
   {
-    $unixFilename = str_replace("\\", "/", $filename);
-    while (strpos($unixFilename, "//") !== false) {
-      $unixFilename = str_replace("//", "/", $filename);
-    }
-    $parts = explode(
-      "/", trim($unixFilename, "/")
-    );
+    require_once "JooS/Stream/Entity.php";
+    
+    $filename = JooS_Stream_Entity::fixPath($filename);
+    $parts = explode("/", $filename);
     $basename = array_pop($parts);
     
     $filepath = "";
@@ -159,8 +156,6 @@ class JooS_Stream_Wrapper_FS_Partition
     if ($this->_changesLinear->exists($filename)) {
       $entity = $this->_changesLinear->get($filename);
     } else {
-      require_once "JooS/Stream/Entity.php";
-
       $entity = JooS_Stream_Entity::newInstance(
         $directory->path() .
         ($partiallyFilepath ? "/" . $partiallyFilepath : "") .
@@ -171,7 +166,7 @@ class JooS_Stream_Wrapper_FS_Partition
   }
   
   /**
-   * Return list of file in path
+   * Return list of files inside directory path
    * 
    * @param string $path Path
    * 
@@ -242,7 +237,9 @@ class JooS_Stream_Wrapper_FS_Partition
   {
     $entity = $this->getEntity($path);
     
-    if (!is_null($entity)) {
+    if ($entity instanceof JooS_Stream_Entity_Deleted_Interface) {
+      $path = null;
+    } elseif (!is_null($entity)) {
       $path = $entity->path();
     } else {
       $path = null;
@@ -370,24 +367,38 @@ class JooS_Stream_Wrapper_FS_Partition
       $result = null;
     } elseif (is_null($dstEntity) || $dstEntity->file_exists()) {
       $result = null;
-    } elseif ($srcEntity->is_file()) {
-      require_once "JooS/Stream/Entity/Virtual.php";
-      
-      $dstFile = JooS_Stream_Entity_Virtual::newInstance(
-        $srcEntity, $srcEntity->path(), $dstEntity->basename()
-      );
-      $this->_changesRegister($dstPath, $dstFile);
+    } else {
+      if ($srcEntity->is_dir()) {
+        $dirStat = $this->getStat($srcPath, 0);
+        $dstEntity = $this->makeDirectory($dstPath, $dirStat["mode"], 0);
+        
+        $list = $this->getList($srcPath);
+        if (sizeof($list)) {
+          foreach ($list as $file) {
+            /* @var $file JooS_Stream_Entity_Interface */
+            $filename = $file->basename();
+            $this->rename(
+              $srcPath . "/" . $filename, 
+              $dstPath . "/" . $filename
+            );
+          }
+        }
+      } else {
+        require_once "JooS/Stream/Entity/Virtual.php";
+
+        $dstEntity = JooS_Stream_Entity_Virtual::newInstance(
+          $srcEntity, $srcEntity->path(), $dstEntity->basename()
+        );
+        $this->_changesRegister($dstPath, $dstEntity);
+      }
       
       require_once "JooS/Stream/Entity/Deleted.php";
-      
-      $srcFile = JooS_Stream_Entity_Deleted::newInstance($srcEntity);
-      $this->_changesRegister($srcPath, $srcFile);
-      
-      $result = $dstFile;
-    } else {
-      $result = null;
+
+      $srcEntity = JooS_Stream_Entity_Deleted::newInstance($srcEntity);
+      $this->_changesRegister($srcPath, $srcEntity);
+
+      $result = $dstEntity;
     }
-    
     return $result;
   }
   

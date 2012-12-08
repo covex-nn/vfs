@@ -24,4 +24,28 @@ class JooS_Stream_Entity extends JooS_Stream_Entity_Abstract
     return new self($basename, $path);
   }
   
+  /**
+   * Fix slashes and backslashes in path
+   * 
+   * @param string $path
+   * 
+   * @return string
+   */
+  public static function fixPath($path) {
+    if (strpos($path, "\\") !== false) {
+      $path = str_replace("\\", "/", $path);
+    }
+    while (strpos($path, "//") !== false) {
+      $path = str_replace("//", "/", $path);
+    }
+    if (strlen($path)) {
+      if (substr($path, 0, 1) == "/") {
+        $path = ltrim($path, "/");
+      }
+      if (substr($path, -1, 1) == "/") {
+        $path = rtrim($path, "/");
+      }
+    }
+    return $path;
+  }
 }

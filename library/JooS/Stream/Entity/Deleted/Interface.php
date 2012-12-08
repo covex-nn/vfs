@@ -2,6 +2,7 @@
 
 /**
  * @package JooS
+ * @subpackage Stream
  */
 require_once "JooS/Stream/Entity/Virtual/Interface.php";
 

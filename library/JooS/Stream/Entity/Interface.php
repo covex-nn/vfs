@@ -2,6 +2,7 @@
 
 /**
  * @package JooS
+ * @subpackage Stream
  */
 
 /**

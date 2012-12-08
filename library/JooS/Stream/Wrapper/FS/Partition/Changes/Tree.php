@@ -2,6 +2,7 @@
 
 /**
  * @package JooS
+ * @subpackage Stream
  */
 require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Interface.php";
 

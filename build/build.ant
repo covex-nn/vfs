@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="PHPackager.JooS_Stream" default="init" basedir=".">
+<project name="JooS_Stream" default="init" basedir=".">
   <property file="build.local.properties" />
   <property file="build.properties" />
   
@@ -8,12 +8,14 @@
   <import file="${lib.path.git}/git.ant" />
   <import file="${lib.path.required}/required.ant" />
   
-  <target name="init">
+  <target name="init" depends="required-download-all" unless="required.JooS_Stream.loaded">
+    <echo message="${ant.project.name} Init - OK" />
+  </target>
+  
+  <target name="required-download-all">
     <antcall target="required-download">
       <param name="repo.dir" value="JooS" />
       <param name="repo.url" value="${required.JooS}" />
     </antcall>
-    
-    <echo message="${ant.project.name} Init - OK" />
   </target>
 </project>

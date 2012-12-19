@@ -33,6 +33,7 @@
 
         <ant antfile="${required.path}/${repo.dir}/build/build.ant" target="init" inheritAll="false" inheritRefs="false">
           <property name="required.path" value="${required.path}" />
+          <property name="required.started" value="true" />
           <property file="${basedir}/${repo.dir}.local.properties" />
           <property file="${basedir}/${repo.dir}.properties" />
           <property file="${required.path}/external.properties" />

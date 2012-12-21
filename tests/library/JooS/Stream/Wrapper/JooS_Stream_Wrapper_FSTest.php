@@ -62,7 +62,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
   {
     $notDirHandler = @opendir($this->protocol . "://file1.txt");
     $this->assertFalse($notDirHandler);
-    
+
     $streamFiles0 = $this->_testDirGetFiles($this->protocol . "://dir3");
     $this->assertEquals(null, $streamFiles0);
 
@@ -87,7 +87,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     $this->assertTrue($unlink2);
     $rmdir5 = rmdir($this->protocol . "://dir1/dir5");
     $this->assertTrue($rmdir5);
-    
+
     $streamFiles4 = $this->_testDirGetFiles($this->protocol . "://dir1");
     $this->assertEquals(array(), $streamFiles4);
 
@@ -101,19 +101,19 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
   public function testFileOperations()
   {
     $filename0 = $this->protocol . "://file1.txt";
-    
+
     $rename2 = rename($this->protocol . "://dir1/dir2/file_not_exists.txt", $this->protocol . "://file2");
     $this->assertFalse($rename2);
-    
+
     $rename3 = rename($this->protocol . "://dir1/file2.txt", $this->protocol . "://file1.txt");
     $this->assertFalse($rename3);
-    
+
     $unlink1 = unlink($this->protocol . "://file1_not_exists.txt");
     $this->assertFalse($unlink1);
-    
+
     $unlink2 = unlink($this->protocol . "://dir1/dir_not_exists/file1_not_exists.txt");
     $this->assertFalse($unlink2);
-    
+
     $this->assertEquals("file1", file_get_contents($filename0));
     file_put_contents($filename0, "qwerty");
     $this->assertEquals("qwerty", file_get_contents($filename0));
@@ -122,35 +122,36 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     $rename1 = rename($filename0, $filename1);
     $this->assertTrue($rename1);
     $this->assertEquals("qwerty", file_get_contents($filename1));
-    
+
     $realFilename = $this->_getFsRoot() . "/file1.txt";
     $this->assertEquals("file1", file_get_contents($realFilename));
   }
-  
-  public function testDirRename() {
+
+  public function testDirRename()
+  {
     $dirname0 = $this->protocol . "://dir1";
     $dirname1 = $this->protocol . "://dir1_renamed";
-    
+
     $not_exists = @file_get_contents($this->protocol . "://dir1/dir_not_exists/file");
     $this->assertFalse($not_exists);
-    
+
     $this->assertTrue(file_exists($dirname0));
     $this->assertFalse(file_exists($dirname1));
     $this->assertTrue(is_dir($dirname0));
-    
+
     $rename1 = rename($dirname0, $dirname1);
     $this->assertTrue($rename1);
-    
+
     $this->assertFalse(file_exists($dirname0));
     $this->assertTrue(file_exists($dirname1));
     $this->assertTrue(is_dir($dirname1));
-    
+
     $file2 = $this->protocol . "://dir1_renamed/file2.txt";
     $file5 = $this->protocol . "://dir1_renamed/dir5/file5.txt";
-    
+
     $this->assertEquals("file2", file_get_contents($file2));
     $this->assertEquals("file5", file_get_contents($file5));
-    
+
     $root = $this->_getFsRoot();
     $this->assertTrue(file_exists($root . "/dir1"));
     $this->assertFalse(file_exists($root . "/dir1_renamed"));

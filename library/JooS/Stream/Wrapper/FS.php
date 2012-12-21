@@ -332,13 +332,21 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
   {
     $result = parent::register($protocol, STREAM_IS_URL);
     if ($result) {
-      require_once "JooS/Stream/Entity.php";
+      if (!is_null($root)) {
+        require_once "JooS/Stream/Entity.php";
 
-      $content = JooS_Stream_Entity::newInstance($root);
+        $content = JooS_Stream_Entity::newInstance($root);
+        
+        require_once "JooS/Stream/Wrapper/FS/Partition.php";
 
-      require_once "JooS/Stream/Wrapper/FS/Partition.php";
-
-      self::$_partitions[$protocol] = new JooS_Stream_Wrapper_FS_Partition($content);
+        $partition = new JooS_Stream_Wrapper_FS_Partition($content);
+      } else {
+        require_once "JooS/Stream/Wrapper/FS/Partition/Virtual.php";
+        
+        $partition = new JooS_Stream_Wrapper_FS_Partition_Virtual();
+      }
+      
+      self::$_partitions[$protocol] = $partition;
     }
     return $result;
   }

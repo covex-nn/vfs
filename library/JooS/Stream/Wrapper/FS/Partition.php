@@ -239,6 +239,8 @@ class JooS_Stream_Wrapper_FS_Partition
     
     if ($entity instanceof JooS_Stream_Entity_Deleted_Interface) {
       $path = null;
+    } elseif (!$entity->file_exists()) {
+      $path = null;
     } elseif (!is_null($entity)) {
       $path = $entity->path();
     } else {

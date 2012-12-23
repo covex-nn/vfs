@@ -415,25 +415,33 @@ class JooS_Stream_Wrapper_FS_Partition
    */
   public function fileOpen($path, $mode, $options, &$entity)
   {
+    
     $entity = $this->getEntity($path);
     
-    if (is_null($entity) || !$entity->is_file()) {
+    if (is_null($entity)) {
       $filePointer = null;
     } else {
-      $fopenWillFail = false;
-      $mode = strtolower($mode);
-      if ($mode != "r") {
-        if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
-          /* @var $entity JooS_Stream_Entity */
-          $tmpPath = $this->_getUniqueFilename();
-          $basename = basename($path);
-          
-          if ($entity->file_exists()) {
-            if ($mode == "x" || $mode == "x+") {
-              $fopenWillFail = true;
-            } else {
-              copy($entity->path(), $tmpPath);
-              
+      $exists = $entity->file_exists();
+      
+      if ($exists && !$entity->is_file()) {
+        $filePointer = null;
+      } else {
+        $fopenWillFail = false;
+        $mode = strtolower($mode);
+        if ($mode != "r") {
+          if (!$exists || !($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
+            /* @var $entity JooS_Stream_Entity */
+            $tmpPath = $this->_getUniqueFilename();
+            $basename = basename($path);
+
+            if ($exists) {
+              if ($mode == "x" || $mode == "x+") {
+                $fopenWillFail = true;
+              } else {
+                copy($entity->path(), $tmpPath);
+              }
+            }
+            if (!$fopenWillFail) {
               require_once "JooS/Stream/Entity/Virtual.php";
 
               $entity = JooS_Stream_Entity_Virtual::newInstance(
@@ -443,15 +451,15 @@ class JooS_Stream_Wrapper_FS_Partition
             }
           }
         }
-      }
-      
-      if ($fopenWillFail) {
-        $entity = null;
-      } else {
-        if ($options & STREAM_REPORT_ERRORS) {
-          $filePointer = fopen($entity->path(), $mode);
+
+        if ($fopenWillFail) {
+          $entity = null;
         } else {
-          $filePointer = @fopen($entity->path(), $mode);
+          if ($options & STREAM_REPORT_ERRORS) {
+            $filePointer = fopen($entity->path(), $mode);
+          } else {
+            $filePointer = @fopen($entity->path(), $mode);
+          }
         }
       }
     }

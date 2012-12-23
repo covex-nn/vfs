@@ -126,6 +126,15 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     $realFilename = $this->_getFsRoot() . "/file1.txt";
     $this->assertEquals("file1", file_get_contents($realFilename));
   }
+  
+  public function testNewFile()
+  {
+    $filename = $this->protocol . "://newfile.txt";
+
+    file_put_contents($filename, "qwerty");
+    
+    $this->assertEquals("qwerty", file_get_contents($filename));
+  }
 
   public function testDirRename()
   {

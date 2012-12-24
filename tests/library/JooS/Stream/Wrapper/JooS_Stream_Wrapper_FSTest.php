@@ -5,15 +5,197 @@ require_once "JooS/Stream/Wrapper/FS.php";
 class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
 {
 
-  protected $protocol = null;
-
-  public function testRegister()
+  public function testRegister1()
   {
-    $this->assertTrue(
-      in_array($this->protocol, stream_get_wrappers())
+    $this->_streamStart(__DIR__);
+    $this->assertTrue(in_array("joos-test", stream_get_wrappers()));
+    
+    $this->assertEquals(
+      file_get_contents(__FILE__), file_get_contents("joos-test://" . basename(__FILE__))
     );
+    
+    $this->_streamStop();
+    $this->assertFalse(in_array("joos-test", stream_get_wrappers()));
+  }
+  
+  public function testFiles()
+  {
+    $this->_filesStart();
+    
+    $this->assertTrue(is_file("joos-test://file1.txt"));
+    $this->assertEquals("file1", file_get_contents("joos-test://file1.txt"));
+    $this->assertTrue(is_dir("joos-test://dir1"));
+    $this->assertTrue(is_file("joos-test://dir1/file2.txt"));
+    $this->assertEquals("file2", file_get_contents("joos-test://dir1/file2.txt"));
+    $this->assertTrue(is_dir("joos-test://dir1/dir5"));
+    $this->assertTrue(is_file("joos-test://dir1/dir5/file5.txt"));
+    $this->assertEquals("file5", file_get_contents("joos-test://dir1/dir5/file5.txt"));
+    
+    $this->assertFalse(file_exists("joos-test://dir1/dir3/file_not_exists.txt"));
+    $this->assertFalse(file_exists("joos-test://dir1/dir5/file_not_exists.txt"));
+    
+    $fp1 = @fopen("joos-test://dir1", "r");
+    $this->assertFalse($fp1);
+    
+    $fp2 = @fopen("joos-test://dir1/dir2/dir3/file_not_exists", "r");
+    $this->assertFalse($fp2);
+    
+    $od1 = @opendir("joos-test://file1.txt");
+    $this->assertFalse($od1);
+    
+    $this->_filesStop();
+  }
+  
+  public function testUnlinkRmdir()
+  {
+    $this->_filesStart();
+    
+    $stat1 = stat("joos-test://dir1/dir5");
+    $this->assertTrue(is_array($stat1));
+    
+    $mkdir1 = @mkdir("joos-test://dir1/dir5");
+    $this->assertFalse($mkdir1);
+    
+    $rmdir1 = @rmdir("joos-test://dir1/dir5");
+    $this->assertFalse($rmdir1);
+    
+    $rmdir2 = @rmdir("joos-test://dir1/dir5/file5.txt");
+    $this->assertFalse($rmdir2);
+    
+    $unlink1 = @unlink("joos-test://dir1/dir5");
+    $this->assertFalse($unlink1);
+    
+    $unlink2 = @unlink("joos-test://dir1/dir5/file_not_exists.txt");
+    $this->assertFalse($unlink2);
+    
+    $unlink3 = @unlink("joos-test://dir1/dir_not_exists/file_not_exists.txt");
+    $this->assertFalse($unlink3);
+    
+    $unlink4 = unlink("joos-test://dir1/dir5/file5.txt");
+    $this->assertTrue($unlink4);
+
+    $rmdir3 = rmdir("joos-test://dir1/dir5");
+    $this->assertTrue($rmdir3);
+    
+    $this->assertFalse(file_exists("joos-test://dir1/dir5/file5.txt"));
+    $this->assertFalse(file_exists("joos-test://dir1/dir5"));
+    
+    $this->_filesStop();
+  }
+  
+  public function testRename()
+  {
+    $this->_filesStart();
+    
+    $rename1 = @rename("joos-test://file1.txt", "joos-test://dir1");
+    $this->assertFalse($rename1);
+    
+    $rename2 = @rename("joos-test://file2.txt", "joos-test://file3.txt");
+    $this->assertFalse($rename2);
+    
+    $rename3 = rename("joos-test://file1.txt", "joos-test://file2.txt");
+    $this->assertTrue($rename3);
+    $this->assertFalse(file_exists("joos-test://file1.txt"));
+    $this->assertTrue(file_exists("joos-test://file2.txt"));
+    $this->assertEquals("file1", file_get_contents("joos-test://file2.txt"));
+    
+    $rename4 = rename("joos-test://dir1", "joos-test://dir2");
+    $this->assertTrue($rename4);
+    $this->assertEquals("file5", file_get_contents("joos-test://dir2/dir5/file5.txt"));
+    $this->assertFalse(file_exists("joos-test://dir1/dir5/file5.txt"));
+    
+    mkdir("joos-test://dir1");
+    file_put_contents("joos-test://dir1/file7.txt", "file7");
+    rename("joos-test://dir1", "joos-test://dir2/dir5/dir7");
+    $this->assertEquals("file7", file_get_contents("joos-test://dir2/dir5/dir7/file7.txt"));
+    
+    $this->_filesStop();
+  }
+  
+  public function testRealFS()
+  {
+    $this->_streamStart(__DIR__ . "/FS_realdir");
+    
+    $this->assertTrue(file_exists("joos-test://dir1/dir2/dir3/file3.txt"));
+    $this->assertFalse(file_exists("joos-test://dir1/dir2/dir3/dir4/file4.txt"));
+    
+    $paths1 = $this->_getAllPaths("joos-test://dir1");
+    $expectedPaths1 = array(
+      "joos-test://dir1/dir2", 
+      "joos-test://dir1/dir2/dir3", 
+      "joos-test://dir1/dir2/dir3/file3.txt", 
+      "joos-test://dir1/dir2/file2.txt", 
+      "joos-test://dir1/file1.txt", 
+    );
+    $this->assertEquals($expectedPaths1, $paths1);
+    
+    unlink("joos-test://dir1/dir2/dir3/file3.txt");
+    rmdir("joos-test://dir1/dir2/dir3");
+    
+    $paths2 = $this->_getAllPaths("joos-test://dir1");
+    $expectedPaths2 = array(
+      "joos-test://dir1/dir2", 
+      "joos-test://dir1/dir2/file2.txt", 
+      "joos-test://dir1/file1.txt", 
+    );
+    $this->assertEquals($expectedPaths2, $paths2);
+    
+    $this->assertTrue(file_exists(__DIR__ . "/FS_realdir/dir1/dir2/dir3/file3.txt"));
+    $this->assertTrue(file_exists(__DIR__ . "/FS_realdir/dir1/dir2/dir3"));
+
+    $fp1 = @fopen("joos-test://dir1/file1.txt", "x+");
+    $this->assertFalse($fp1);
+    
+    $this->_streamStop();
+  }
+  
+  protected function _getAllPaths($dir)
+  {
+    $iteratorRd = new RecursiveDirectoryIterator($dir);
+    $iteratorRi = new RecursiveIteratorIterator(
+      $iteratorRd, RecursiveIteratorIterator::SELF_FIRST
+    );
+    $paths = array();
+    foreach ($iteratorRi as $file) {
+      /* @var $file SplFileInfo */
+      $pathname = str_replace(
+        DIRECTORY_SEPARATOR, "/", $file->getPathname()
+      );
+      $paths[] = $pathname;
+    }
+    return $paths;
+  }
+  
+  protected function _filesStart()
+  {
+    $this->_streamStart();
+    
+    file_put_contents("joos-test://file1.txt", "file1");
+    mkdir("joos-test://dir1");
+    file_put_contents("joos-test://dir1/file2.txt", "file2");
+    mkdir("joos-test://dir1/dir5");
+    file_put_contents("joos-test://dir1/dir5/file5.txt", "file5");
+  }
+  
+  protected function _filesStop()
+  {
+    $this->_streamStop();
   }
 
+  
+  protected function _streamStart($dir = null)
+  {
+    if (in_array("joos-test", stream_get_wrappers())) {
+      $this->_streamStop();
+    }
+    JooS_Stream_Wrapper_FS::register("joos-test", $dir);
+  }
+  
+  protected function _streamStop()
+  {
+    JooS_Stream_Wrapper_FS::unregister("joos-test");
+  }
+  
   /**
    * @dataProvider providerGetRelativePath
    */
@@ -31,195 +213,5 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
       array('test://\\dir1\\dir2'),
     );
   }
-
-  public function testStat()
-  {
-    $realDir = $this->_getFsRoot();
-    $realFile = $realDir . "/file1.txt";
-
-    $streamFile1 = $this->protocol . "://file1.txt";
-    $this->assertEquals(stat($realFile), stat($streamFile1));
-
-    $streamFile2 = $this->protocol . "://dir_not_exists/file_not_exists.txt";
-    $this->assertEquals(false, @stat($streamFile2));
-
-    $streamFile2 = $this->protocol . "://file_not_exists.txt";
-    $this->assertEquals(false, @stat($streamFile2));
-  }
-
-  public function testMkdir()
-  {
-    $dir2 = $this->protocol . "://dir2";
-
-    $this->assertFalse(file_exists($dir2));
-    mkdir($dir2);
-
-    $this->assertTrue(file_exists($dir2));
-    $this->assertTrue(is_dir($dir2));
-  }
-
-  public function testDir()
-  {
-    $notDirHandler = @opendir($this->protocol . "://file1.txt");
-    $this->assertFalse($notDirHandler);
-
-    $streamFiles0 = $this->_testDirGetFiles($this->protocol . "://dir3");
-    $this->assertEquals(null, $streamFiles0);
-
-    $streamFiles1 = $this->_testDirGetFiles($this->protocol . "://dir1");
-    $this->assertEquals(array("dir5", "file2.txt"), $streamFiles1);
-
-    $mkdir1 = mkdir($this->protocol . "://dir1/dir2");
-    $this->assertTrue($mkdir1);
-
-    $streamFiles2 = $this->_testDirGetFiles($this->protocol . "://dir1");
-    $this->assertEquals(array("dir2", "dir5", "file2.txt"), $streamFiles2);
-
-    $rmdir1 = rmdir($this->protocol . "://dir1/dir2");
-    $this->assertTrue($rmdir1);
-
-    $streamFiles3 = $this->_testDirGetFiles($this->protocol . "://dir1");
-    $this->assertEquals(array("dir5", "file2.txt"), $streamFiles3);
-
-    $unlink1 = unlink($this->protocol . "://dir1/file2.txt");
-    $this->assertTrue($unlink1);
-    $unlink2 = unlink($this->protocol . "://dir1/dir5/file5.txt");
-    $this->assertTrue($unlink2);
-    $rmdir5 = rmdir($this->protocol . "://dir1/dir5");
-    $this->assertTrue($rmdir5);
-
-    $streamFiles4 = $this->_testDirGetFiles($this->protocol . "://dir1");
-    $this->assertEquals(array(), $streamFiles4);
-
-    $rmdir2 = rmdir($this->protocol . "://dir1");
-    $this->assertTrue($rmdir2);
-
-    $streamFiles5 = $this->_testDirGetFiles($this->protocol . "://");
-    $this->assertEquals(array("file1.txt"), $streamFiles5);
-  }
-
-  public function testFileOperations()
-  {
-    $filename0 = $this->protocol . "://file1.txt";
-
-    $rename2 = rename($this->protocol . "://dir1/dir2/file_not_exists.txt", $this->protocol . "://file2");
-    $this->assertFalse($rename2);
-
-    $rename3 = rename($this->protocol . "://dir1/file2.txt", $this->protocol . "://file1.txt");
-    $this->assertFalse($rename3);
-
-    $unlink1 = unlink($this->protocol . "://file1_not_exists.txt");
-    $this->assertFalse($unlink1);
-
-    $unlink2 = unlink($this->protocol . "://dir1/dir_not_exists/file1_not_exists.txt");
-    $this->assertFalse($unlink2);
-
-    $this->assertEquals("file1", file_get_contents($filename0));
-    file_put_contents($filename0, "qwerty");
-    $this->assertEquals("qwerty", file_get_contents($filename0));
-
-    $filename1 = $this->protocol . "://file1_renamed.txt";
-    $rename1 = rename($filename0, $filename1);
-    $this->assertTrue($rename1);
-    $this->assertEquals("qwerty", file_get_contents($filename1));
-
-    $realFilename = $this->_getFsRoot() . "/file1.txt";
-    $this->assertEquals("file1", file_get_contents($realFilename));
-  }
   
-  public function testNewFile()
-  {
-    $filename = $this->protocol . "://newfile.txt";
-
-    file_put_contents($filename, "qwerty");
-    
-    $this->assertEquals("qwerty", file_get_contents($filename));
-  }
-
-  public function testDirRename()
-  {
-    $dirname0 = $this->protocol . "://dir1";
-    $dirname1 = $this->protocol . "://dir1_renamed";
-
-    $not_exists = @file_get_contents($this->protocol . "://dir1/dir_not_exists/file");
-    $this->assertFalse($not_exists);
-
-    $this->assertTrue(file_exists($dirname0));
-    $this->assertFalse(file_exists($dirname1));
-    $this->assertTrue(is_dir($dirname0));
-
-    $rename1 = rename($dirname0, $dirname1);
-    $this->assertTrue($rename1);
-
-    $this->assertFalse(file_exists($dirname0));
-    $this->assertTrue(file_exists($dirname1));
-    $this->assertTrue(is_dir($dirname1));
-
-    $file2 = $this->protocol . "://dir1_renamed/file2.txt";
-    $file5 = $this->protocol . "://dir1_renamed/dir5/file5.txt";
-
-    $this->assertEquals("file2", file_get_contents($file2));
-    $this->assertEquals("file5", file_get_contents($file5));
-
-    $root = $this->_getFsRoot();
-    $this->assertTrue(file_exists($root . "/dir1"));
-    $this->assertFalse(file_exists($root . "/dir1_renamed"));
-  }
-
-  protected function _testDirGetFiles($dir)
-  {
-    if (is_dir($dir)) {
-      $files = array();
-
-      $dh = opendir($dir);
-      if ($dh) {
-        while (($file = readdir($dh)) !== false) {
-          $files[] = $file;
-        }
-
-        rewinddir($dh);
-        $filesAfterRewind = array();
-        while (($file = readdir($dh)) !== false) {
-          $filesAfterRewind[] = $file;
-        }
-        $this->assertEquals($files, $filesAfterRewind);
-
-        closedir($dh);
-      }
-      sort($files);
-    } else {
-      $files = null;
-    }
-    return $files;
-  }
-
-  protected function setUp()
-  {
-    if (is_null($this->protocol)) {
-      $this->protocol = $this->_randomValue();
-    }
-
-    JooS_Stream_Wrapper_FS::register($this->protocol, $this->_getFsRoot());
-  }
-
-  protected function tearDown()
-  {
-    try {
-      JooS_Stream_Wrapper_FS::unregister($this->protocol);
-    } catch (JooS_Stream_Wrapper_Exception $e) {
-      
-    }
-  }
-
-  protected function _randomValue($prefix = "stream")
-  {
-    return uniqid($prefix);
-  }
-
-  protected function _getFsRoot()
-  {
-    return dirname(__FILE__) . "/_root";
-  }
-
 }
-

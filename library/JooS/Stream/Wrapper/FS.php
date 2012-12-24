@@ -110,11 +110,10 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
    * Open directory handle
    * 
    * @param string $url     Path
-   * @param int    $options Options
    * 
    * @return boolean
    */
-  public function dir_opendir($url, $options)
+  public function dir_opendir($url)
   {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
@@ -328,7 +327,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
    * 
    * @return boolean
    */
-  public static function register($protocol, $root)
+  public static function register($protocol, $root = null)
   {
     $result = parent::register($protocol, STREAM_IS_URL);
     if ($result) {
@@ -336,19 +335,29 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
         require_once "JooS/Stream/Entity.php";
 
         $content = JooS_Stream_Entity::newInstance($root);
-        
-        require_once "JooS/Stream/Wrapper/FS/Partition.php";
-
-        $partition = new JooS_Stream_Wrapper_FS_Partition($content);
       } else {
-        require_once "JooS/Stream/Wrapper/FS/Partition/Virtual.php";
-        
-        $partition = new JooS_Stream_Wrapper_FS_Partition_Virtual();
+        $content = null;
       }
+
+      require_once "JooS/Stream/Wrapper/FS/Partition.php";
+      
+      $partition = new JooS_Stream_Wrapper_FS_Partition($content);
       
       self::$_partitions[$protocol] = $partition;
     }
     return $result;
+  }
+  
+  /**
+   * Commit all changes to real FS
+   * 
+   * @param string $protocol Protocol name
+   * 
+   * @return boolean
+   */
+  public static function commit($protocol)
+  {
+    
   }
   
   /**

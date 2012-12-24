@@ -35,8 +35,16 @@ class JooS_Stream_Wrapper_FS_Partition
    * 
    * @param JooS_Stream_Entity_Interface $content Folder
    */
-  public function __construct(JooS_Stream_Entity_Interface $content)
+  public function __construct(JooS_Stream_Entity_Interface $content = null)
   {
+    if (is_null($content)) {
+      $folder = $this->_makeDirectory(0777);
+      
+      require_once "JooS/Stream/Entity.php";
+      
+      $content = JooS_Stream_Entity::newInstance($folder);
+    }
+    
     $this->setRoot($content);
 
     require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Linear.php";
@@ -62,6 +70,7 @@ class JooS_Stream_Wrapper_FS_Partition
         $rdIterator, RecursiveIteratorIterator::CHILD_FIRST
       );
       foreach ($riIterator as $file) {
+        /* @var $file SplFileInfo */
         if ($file->isDir()) {
           rmdir($file->getPathname());
         } else {

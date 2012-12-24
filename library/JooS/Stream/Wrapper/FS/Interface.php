@@ -77,13 +77,12 @@ interface JooS_Stream_Wrapper_FS_Interface
    * This method is called in response to opendir().
    * 
    * @param string $path    Path
-   * @param int    $options Options
    * 
    * @link http://www.php.net/manual/en/streamwrapper.dir-opendir.php
    * @return boolean
    * @todo JooS_Stream_Wrapper_FS
    */
-  public function dir_opendir($path, $options);
+  public function dir_opendir($path);
   
   /**
    * Read entry from directory handle

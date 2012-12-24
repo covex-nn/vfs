@@ -4,13 +4,11 @@
  * @package JooS
  * @subpackage Stream
  */
-require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Interface.php";
 
 /**
  * Partition changes, tree data.
  */
-class JooS_Stream_Wrapper_FS_Partition_Changes_Tree
-  implements JooS_Stream_Wrapper_FS_Partition_Changes_Interface
+class JooS_Stream_Wrapper_FS_Partition_Changes
 {
   /**
    * @var array

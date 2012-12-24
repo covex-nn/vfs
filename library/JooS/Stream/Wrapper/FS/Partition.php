@@ -4,7 +4,6 @@
  * @package JooS
  * @subpackage Stream
  */
-require_once "JooS/Stream/Wrapper/FS/Partition/Interface.php";
 
 /**
  * Filesystem tree.
@@ -12,7 +11,6 @@ require_once "JooS/Stream/Wrapper/FS/Partition/Interface.php";
  * @todo нужно проверять на is_writable !!!
  */
 class JooS_Stream_Wrapper_FS_Partition
-  implements JooS_Stream_Wrapper_FS_Partition_Interface
 {
   
   /**
@@ -21,14 +19,9 @@ class JooS_Stream_Wrapper_FS_Partition
   private $_root = null;
   
   /**
-   * @var JooS_Stream_Wrapper_FS_Partition_Changes_Linear
+   * @var JooS_Stream_Wrapper_FS_Partition_Changes
    */
-  private $_changesLinear = null;
-  
-  /**
-   * @var JooS_Stream_Wrapper_FS_Partition_Changes_Tree
-   */
-  private $_changesTree = null;
+  private $_changes = null;
   
   /**
    * Constructor
@@ -47,13 +40,9 @@ class JooS_Stream_Wrapper_FS_Partition
     
     $this->setRoot($content);
 
-    require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Linear.php";
+    require_once "JooS/Stream/Wrapper/FS/Partition/Changes.php";
     
-    $this->_changesLinear = new JooS_Stream_Wrapper_FS_Partition_Changes_Linear();
-
-    require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Tree.php";
-    
-    $this->_changesTree = new JooS_Stream_Wrapper_FS_Partition_Changes_Tree();
+    $this->_changes = new JooS_Stream_Wrapper_FS_Partition_Changes();
   }
   
   /**
@@ -142,11 +131,11 @@ class JooS_Stream_Wrapper_FS_Partition
         $partiallyFilepath = $name;
       }
       
-      $changesExists = $this->_changesLinear->exists($filepath);
+      $changesExists = $this->_changes->exists($filepath);
       if ($changesExists || $changesStage) {
         $changesStage = true;
         if ($changesExists) {
-          $directory = $this->_changesLinear->get($filepath);
+          $directory = $this->_changes->get($filepath);
           $partiallyFilepath = "";
           if (!$directory->file_exists() || !$directory->is_dir()) {
             return null;
@@ -162,8 +151,8 @@ class JooS_Stream_Wrapper_FS_Partition
       }
     }
     
-    if ($this->_changesLinear->exists($filename)) {
-      $entity = $this->_changesLinear->get($filename);
+    if ($this->_changes->exists($filename)) {
+      $entity = $this->_changes->get($filename);
     } else {
       $entity = JooS_Stream_Entity::newInstance(
         $directory->path() .
@@ -187,7 +176,7 @@ class JooS_Stream_Wrapper_FS_Partition
     
     if (!is_null($entity) && $entity->file_exists() && $entity->is_dir()) {
       $files = array();
-      $changes = $this->_changesTree->own($path);
+      $changes = $this->_changes->own($path);
 
       if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
         $directory = $this->getRoot();
@@ -288,7 +277,7 @@ class JooS_Stream_Wrapper_FS_Partition
         require_once "JooS/Stream/Entity/Virtual.php";
         
         $result = JooS_Stream_Entity_Virtual::newInstance($entity, $tmpPath);
-        $this->_changesRegister($path, $result);
+        $this->_changes->add($path, $result);
       }
     } else {
       /* @todo сделать поддержку STREAM_MKDIR_RECURSIVE */
@@ -324,7 +313,7 @@ class JooS_Stream_Wrapper_FS_Partition
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $result = JooS_Stream_Entity_Deleted::newInstance($entity);
-      $this->_changesRegister($path, $result);
+      $this->_changes->add($path, $result);
     }
     
     if (is_null($result) && ($options & STREAM_REPORT_ERRORS)) {
@@ -355,7 +344,7 @@ class JooS_Stream_Wrapper_FS_Partition
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $result = JooS_Stream_Entity_Deleted::newInstance($entity);
-      $this->_changesRegister($path, $result);
+      $this->_changes->add($path, $result);
     }
     
     return $result;
@@ -400,13 +389,13 @@ class JooS_Stream_Wrapper_FS_Partition
         $dstEntity = JooS_Stream_Entity_Virtual::newInstance(
           $srcEntity, $srcEntity->path(), $dstEntity->basename()
         );
-        $this->_changesRegister($dstPath, $dstEntity);
+        $this->_changes->add($dstPath, $dstEntity);
       }
       
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $srcEntity = JooS_Stream_Entity_Deleted::newInstance($srcEntity);
-      $this->_changesRegister($srcPath, $srcEntity);
+      $this->_changes->add($srcPath, $srcEntity);
 
       $result = $dstEntity;
     }
@@ -458,7 +447,7 @@ class JooS_Stream_Wrapper_FS_Partition
               $entity = JooS_Stream_Entity_Virtual::newInstance(
                 $entity, $tmpPath, $basename
               );
-              $this->_changesRegister($path, $entity);
+              $this->_changes->add($path, $entity);
             }
           }
         }
@@ -476,20 +465,6 @@ class JooS_Stream_Wrapper_FS_Partition
     }
 
     return $filePointer;
-  }
-  
-  /**
-   * Register changes in FS
-   * 
-   * @param string                       $path   Path to changes
-   * @param JooS_Stream_Entity_Interface $entity Entity
-   * 
-   * @return null
-   */
-  protected function _changesRegister($path, JooS_Stream_Entity_Interface $entity)
-  {
-    $this->_changesLinear->add($path, $entity);
-    $this->_changesTree->add($path, $entity);
   }
   
   /**

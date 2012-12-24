@@ -1,13 +1,13 @@
 <?php
 
-require_once "JooS/Stream/Wrapper/FS/Partition/Changes/Tree.php";
+require_once "JooS/Stream/Wrapper/FS/Partition/Changes.php";
 
-class JooS_Stream_Wrapper_FS_Partition_Changes_TreeTest extends PHPUnit_Framework_TestCase
+class JooS_Stream_Wrapper_FS_Partition_ChangesTest extends PHPUnit_Framework_TestCase
 {
 
   public function testInterface()
   {
-    $changes = new JooS_Stream_Wrapper_FS_Partition_Changes_Tree();
+    $changes = new JooS_Stream_Wrapper_FS_Partition_Changes();
 
     $this->assertFalse($changes->exists("qqq/www/eee"));
     $this->assertEquals(null, $changes->get("qqq/www/eee"));
@@ -37,7 +37,7 @@ class JooS_Stream_Wrapper_FS_Partition_Changes_TreeTest extends PHPUnit_Framewor
     $this->assertEquals(array(), $changes->own("qqq"));
     $this->assertEquals(array("qqq/www/eee" => $entity), $changes->own("qqq/www"));
     $this->assertEquals(array(), $changes->own("qqq/www/eee"));
-    
+
     $this->assertTrue($changes->delete("qqq/www/eee"));
 
     $this->assertFalse($changes->exists("qqq/www/eee"));

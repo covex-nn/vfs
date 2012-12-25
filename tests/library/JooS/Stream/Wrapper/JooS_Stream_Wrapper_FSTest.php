@@ -22,7 +22,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
       array('test://\\dir1\\dir2'),
     );
   }
-  
+
   public function testRegister1()
   {
     $this->_streamStart(__DIR__);
@@ -166,12 +166,22 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
 
     $this->_streamStop();
   }
+
+  public function testCommit1()
+  {
+    $this->_streamStart();
+    
+    $commit = JooS_Stream_Wrapper_FS::commit("joos-test");
+    $this->assertTrue($commit);
+
+    $this->_streamStop();
+  }
   
-  public function testCommit()
+  public function testCommit2()
   {
     $commit1 = JooS_Stream_Wrapper_FS::commit("joos-test-not-a-protocol");
     $this->assertFalse($commit1);
-    
+
     $this->_streamStart(null, "joos1-test");
     mkdir("joos1-test://root");
     file_put_contents("joos1-test://root/file0.txt", "file0");
@@ -180,7 +190,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     mkdir("joos1-test://root/dir1/dir2");
     file_put_contents("joos1-test://root/dir1/dir2/file2.txt", "file2");
     mkdir("joos1-test://root/dir3");
-    
+
     /**
      * dir1
      * dir1/dir2
@@ -190,7 +200,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
      * file0.txt (file0)
      */
     $this->_streamStart("joos1-test://root", "joos2-test");
-    
+
     file_put_contents("joos2-test://file0-0.txt", "file0-0");
     unlink("joos2-test://file0-0.txt");
     file_put_contents("joos2-test://file0.txt", "file0-0");
@@ -203,9 +213,9 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
 
     $commit2 = JooS_Stream_Wrapper_FS::commit("joos2-test");
     $this->assertTrue($commit2);
-    
+
     $this->_streamStop("joos2-test");
-    
+
     // dir1
     $this->assertTrue(file_exists("joos1-test://root/dir1"));
     $this->assertTrue(is_dir("joos1-test://root/dir1"));
@@ -230,7 +240,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     $this->assertTrue(file_exists("joos1-test://root/dir4/file4.txt"));
     $this->assertTrue(is_file("joos1-test://root/dir4/file4.txt"));
     $this->assertEquals("file4", file_get_contents("joos1-test://root/dir4/file4.txt"));
-    
+
     $this->_streamStop("joos1-test");
   }
 

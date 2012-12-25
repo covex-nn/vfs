@@ -490,9 +490,11 @@ class JooS_Stream_Wrapper_FS_Partition
    */
   public function commit()
   {
-    $this->_commit($this->_changes);
+    if (!is_null($this->_changes)) {
+      $this->_commit($this->_changes);
     
-    $this->_changes = null;
+      $this->_changes = null;
+    }
   }
   
   /**

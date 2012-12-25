@@ -86,6 +86,11 @@ class JooS_Stream_Wrapper_FS_Partition
     $this->_root = $entity;
   }
   
+  /**
+   * Return FS-changes object
+   * 
+   * @return JooS_Stream_Wrapper_FS_Changes
+   */
   protected function getChanges()
   {
     if (is_null($this->_changes)) {
@@ -172,8 +177,8 @@ class JooS_Stream_Wrapper_FS_Partition
     
     if (!is_null($entity) && $entity->file_exists() && $entity->is_dir()) {
       $files = array();
-      $changes = $this->getChanges()
-        ->own($path);
+      $changes = $this->getChanges();
+      $own = $changes->own($path);
 
       if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
         $directory = $this->getRoot();
@@ -192,7 +197,7 @@ class JooS_Stream_Wrapper_FS_Partition
             }
             
             $changesKey = ($path ? $path . "/" : "") . $file;
-            if (isset($changes[$changesKey])) {
+            if (isset($own[$changesKey])) {
               continue;
             } else {
               $files[$changesKey] = JooS_Stream_Entity::newInstance($changesKey);
@@ -202,14 +207,14 @@ class JooS_Stream_Wrapper_FS_Partition
         }
       }
       
-      foreach ($changes as $changesKey => $file) {
+      foreach ($own as $changesKey => $file) {
         /* @var $file JooS_Stream_Entity_Interface */
         if ($file instanceof JooS_Stream_Entity_Deleted_Interface) {
-          unset($changes[$changesKey]);
+          unset($own[$changesKey]);
         }
       }
       
-      $mergedFiles = array_merge($files, $changes);
+      $mergedFiles = array_merge($files, $own);
       ksort($mergedFiles);
       
       $result = array_values($mergedFiles);
@@ -274,8 +279,9 @@ class JooS_Stream_Wrapper_FS_Partition
         require_once "JooS/Stream/Entity/Virtual.php";
         
         $result = JooS_Stream_Entity_Virtual::newInstance($entity, $tmpPath);
-        $this->getChanges()
-          ->add($path, $result);
+        
+        $changes = $this->getChanges();
+        $changes->add($path, $result);
       }
     } else {
       /* @todo сделать поддержку STREAM_MKDIR_RECURSIVE */
@@ -311,8 +317,9 @@ class JooS_Stream_Wrapper_FS_Partition
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $result = JooS_Stream_Entity_Deleted::newInstance($entity);
-      $this->getChanges()
-        ->add($path, $result);
+      
+      $changes = $this->getChanges();
+      $changes->add($path, $result);
     }
     
     if (is_null($result) && ($options & STREAM_REPORT_ERRORS)) {
@@ -343,8 +350,9 @@ class JooS_Stream_Wrapper_FS_Partition
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $result = JooS_Stream_Entity_Deleted::newInstance($entity);
-      $this->getChanges()
-        ->add($path, $result);
+      
+      $changes = $this->getChanges();
+      $changes->add($path, $result);
     }
     
     return $result;
@@ -434,7 +442,8 @@ class JooS_Stream_Wrapper_FS_Partition
         $fopenWillFail = false;
         $mode = strtolower($mode);
         if ($mode != "r") {
-          if (!$exists || !($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
+          $isVirtual = ($entity instanceof JooS_Stream_Entity_Virtual_Interface);
+          if (!$exists || !$isVirtual) {
             /* @var $entity JooS_Stream_Entity */
             $tmpPath = $this->_getUniqueFilename();
             $basename = basename($path);
@@ -452,8 +461,9 @@ class JooS_Stream_Wrapper_FS_Partition
               $entity = JooS_Stream_Entity_Virtual::newInstance(
                 $entity, $tmpPath, $basename
               );
-              $this->getChanges()
-                ->add($path, $entity);
+              
+              $changes = $this->getChanges();
+              $changes->add($path, $entity);
             }
           }
         }
@@ -593,14 +603,14 @@ class JooS_Stream_Wrapper_FS_Partition
    * - сделать тоже самое, если не было собственных изменений
    * 
    * @param JooS_Stream_Wrapper_FS_Changes $changes Changes in FS
-   * @param string $path Path to commit
+   * @param string                         $path    Path to commit
    * 
    * @return null
    */
   private function _commit(JooS_Stream_Wrapper_FS_Changes $changes, $path = "")
   {
-    $root = $this->getRoot()
-      ->path();
+    $root = $this->getRoot();
+    $rootpath = $root->path();
     
     if ($path) {
       $path .= "/";
@@ -609,7 +619,7 @@ class JooS_Stream_Wrapper_FS_Partition
     $own = $changes->own();
     foreach ($own as $filename => $vEntity) {
       $filepath = $path . $filename;
-      $rPath = $root . "/" . $filepath;
+      $rPath = $rootpath . "/" . $filepath;
       
       /* @var $vEntity JooS_Stream_Entity_Virtual_Interface */
       $vExists = $vEntity->file_exists();
@@ -626,21 +636,16 @@ class JooS_Stream_Wrapper_FS_Partition
         $rDeleted = true;
       }
 
-//      echo "\n$filepath\n";
       if (!$vExists && !$rExists) {
-//        echo "* not exists before and after\n";
         continue;
       } elseif ($rDeleted) {
         if ($rExists) {
-//          echo "* exist before\n";
           $this->_deleteFileOrDirectory($rPath);
         }
         if ($vExists) {
-//          echo "* exist after\n";
           $this->_copyChanges($filepath);
         }
       } else {
-//        echo "* exist but was changed\n";
         /* @var $vEntity JooS_Stream_Entity_Virtual */
         if ($vEntity->is_file()) {
           unlink($rPath);

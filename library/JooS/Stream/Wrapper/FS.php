@@ -109,7 +109,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
   /**
    * Open directory handle
    * 
-   * @param string $url     Path
+   * @param string $url Path
    * 
    * @return boolean
    */

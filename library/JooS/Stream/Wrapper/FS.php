@@ -357,7 +357,17 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
    */
   public static function commit($protocol)
   {
+    if (isset(self::$_partitions[$protocol])) {
+      $partition = self::$_partitions[$protocol];
+      /* @var $partition JooS_Stream_Wrapper_FS_Partition */
+      $partition->commit();
+      
+      $result = true;
+    } else {
+      $result = false;
+    }
     
+    return $result;
   }
   
   /**
@@ -380,7 +390,6 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
    * @param string $url Url
    * 
    * @return JooS_Stream_Wrapper_FS_Partition
-   * @throws JooS_Stream_Wrapper_FS_Exception
    */
   protected static function getPartition($url)
   {

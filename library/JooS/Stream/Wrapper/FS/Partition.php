@@ -8,7 +8,9 @@
 /**
  * Filesystem tree.
  * 
- * @todo нужно проверять на is_writable !!!
+ * @todo нужно проверять на is_writable:
+ *        1) изменение/удаление реальных файлов
+ *        2) создание файлов/каталогов в реальных каталогов
  */
 class JooS_Stream_Wrapper_FS_Partition
 {
@@ -19,7 +21,7 @@ class JooS_Stream_Wrapper_FS_Partition
   private $_root = null;
   
   /**
-   * @var JooS_Stream_Wrapper_FS_Partition_Changes
+   * @var JooS_Stream_Wrapper_FS_Changes
    */
   private $_changes = null;
   
@@ -37,12 +39,7 @@ class JooS_Stream_Wrapper_FS_Partition
       
       $content = JooS_Stream_Entity::newInstance($folder);
     }
-    
     $this->setRoot($content);
-
-    require_once "JooS/Stream/Wrapper/FS/Partition/Changes.php";
-    
-    $this->_changes = new JooS_Stream_Wrapper_FS_Partition_Changes();
   }
   
   /**
@@ -54,19 +51,7 @@ class JooS_Stream_Wrapper_FS_Partition
   {
     $dir = $this->_getSystemTempDirectory(false);
     if (!is_null($dir)) {
-      $rdIterator = new RecursiveDirectoryIterator($dir);
-      $riIterator = new RecursiveIteratorIterator(
-        $rdIterator, RecursiveIteratorIterator::CHILD_FIRST
-      );
-      foreach ($riIterator as $file) {
-        /* @var $file SplFileInfo */
-        if ($file->isDir()) {
-          rmdir($file->getPathname());
-        } else {
-          unlink($file->getPathname());
-        }
-      }
-      rmdir($dir);
+      $this->_deleteFileOrDirectory($dir);
     }
   }
   
@@ -101,16 +86,27 @@ class JooS_Stream_Wrapper_FS_Partition
     $this->_root = $entity;
   }
   
+  protected function getChanges()
+  {
+    if (is_null($this->_changes)) {
+      require_once "JooS/Stream/Wrapper/FS/Changes.php";
+
+      $this->_changes = new JooS_Stream_Wrapper_FS_Changes();
+    }
+    return $this->_changes;
+  }
+  
   /**
    * Return file/directory entity
    * 
    * @param string $filename Path to file/directory
    * 
    * @return JooS_Stream_Entity_Interface
-   * @throws JooS_Stream_Wrapper_FS_Exception
    */
   public function getEntity($filename)
   {
+    $changes = $this->getChanges();
+    
     require_once "JooS/Stream/Entity.php";
     
     $filename = JooS_Stream_Entity::fixPath($filename);
@@ -131,11 +127,11 @@ class JooS_Stream_Wrapper_FS_Partition
         $partiallyFilepath = $name;
       }
       
-      $changesExists = $this->_changes->exists($filepath);
+      $changesExists = $changes->exists($filepath);
       if ($changesExists || $changesStage) {
         $changesStage = true;
         if ($changesExists) {
-          $directory = $this->_changes->get($filepath);
+          $directory = $changes->get($filepath);
           $partiallyFilepath = "";
           if (!$directory->file_exists() || !$directory->is_dir()) {
             return null;
@@ -151,8 +147,8 @@ class JooS_Stream_Wrapper_FS_Partition
       }
     }
     
-    if ($this->_changes->exists($filename)) {
-      $entity = $this->_changes->get($filename);
+    if ($changes->exists($filename)) {
+      $entity = $changes->get($filename);
     } else {
       $entity = JooS_Stream_Entity::newInstance(
         $directory->path() .
@@ -176,7 +172,8 @@ class JooS_Stream_Wrapper_FS_Partition
     
     if (!is_null($entity) && $entity->file_exists() && $entity->is_dir()) {
       $files = array();
-      $changes = $this->_changes->own($path);
+      $changes = $this->getChanges()
+        ->own($path);
 
       if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
         $directory = $this->getRoot();
@@ -277,7 +274,8 @@ class JooS_Stream_Wrapper_FS_Partition
         require_once "JooS/Stream/Entity/Virtual.php";
         
         $result = JooS_Stream_Entity_Virtual::newInstance($entity, $tmpPath);
-        $this->_changes->add($path, $result);
+        $this->getChanges()
+          ->add($path, $result);
       }
     } else {
       /* @todo сделать поддержку STREAM_MKDIR_RECURSIVE */
@@ -313,7 +311,8 @@ class JooS_Stream_Wrapper_FS_Partition
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $result = JooS_Stream_Entity_Deleted::newInstance($entity);
-      $this->_changes->add($path, $result);
+      $this->getChanges()
+        ->add($path, $result);
     }
     
     if (is_null($result) && ($options & STREAM_REPORT_ERRORS)) {
@@ -344,7 +343,8 @@ class JooS_Stream_Wrapper_FS_Partition
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $result = JooS_Stream_Entity_Deleted::newInstance($entity);
-      $this->_changes->add($path, $result);
+      $this->getChanges()
+        ->add($path, $result);
     }
     
     return $result;
@@ -360,6 +360,8 @@ class JooS_Stream_Wrapper_FS_Partition
    */
   public function rename($srcPath, $dstPath)
   {
+    $changes = $this->getChanges();
+    
     $srcEntity = $this->getEntity($srcPath);
     $dstEntity = $this->getEntity($dstPath);
     
@@ -386,16 +388,19 @@ class JooS_Stream_Wrapper_FS_Partition
       } else {
         require_once "JooS/Stream/Entity/Virtual.php";
 
+        $tmpPath = $this->_getUniqueFilename();
+        copy($srcEntity->path(), $tmpPath);
+        
         $dstEntity = JooS_Stream_Entity_Virtual::newInstance(
-          $srcEntity, $srcEntity->path(), $dstEntity->basename()
+          $dstEntity, $tmpPath, $dstEntity->basename()
         );
-        $this->_changes->add($dstPath, $dstEntity);
+        $changes->add($dstPath, $dstEntity);
       }
       
       require_once "JooS/Stream/Entity/Deleted.php";
 
       $srcEntity = JooS_Stream_Entity_Deleted::newInstance($srcEntity);
-      $this->_changes->add($srcPath, $srcEntity);
+      $changes->add($srcPath, $srcEntity);
 
       $result = $dstEntity;
     }
@@ -447,7 +452,8 @@ class JooS_Stream_Wrapper_FS_Partition
               $entity = JooS_Stream_Entity_Virtual::newInstance(
                 $entity, $tmpPath, $basename
               );
-              $this->_changes->add($path, $entity);
+              $this->getChanges()
+                ->add($path, $entity);
             }
           }
         }
@@ -468,6 +474,18 @@ class JooS_Stream_Wrapper_FS_Partition
   }
   
   /**
+   * Commit changes to real FS
+   * 
+   * @return null
+   */
+  public function commit()
+  {
+    $this->_commit($this->_changes);
+    
+    $this->_changes = null;
+  }
+  
+  /**
    * Creates directory in sys_get_temp_dir()
    * 
    * @param int $mode Mode
@@ -482,6 +500,34 @@ class JooS_Stream_Wrapper_FS_Partition
     return $name;
   }
 
+  /**
+   * Delete file or directory
+   * 
+   * @param string $path Path
+   * 
+   * @return null
+   */
+  private function _deleteFileOrDirectory($path)
+  {
+    if (is_file($path)) {
+      unlink($path);
+    } else {
+      $iteratorRd = new RecursiveDirectoryIterator($path);
+      $iteratorRi = new RecursiveIteratorIterator(
+        $iteratorRd, RecursiveIteratorIterator::CHILD_FIRST
+      );
+      foreach ($iteratorRi as $file) {
+        /* @var $file SplFileInfo */
+        if ($file->isDir()) {
+          rmdir($file->getPathname());
+        } else {
+          unlink($file->getPathname());
+        }
+      }
+      rmdir($path);
+    }
+  }
+  
   private $_uniqueFilenameCounter = 0;
   
   /**
@@ -512,7 +558,7 @@ class JooS_Stream_Wrapper_FS_Partition
    * 
    * @return string
    */
-  protected function _getSystemTempDirectory($create = true)
+  private function _getSystemTempDirectory($create = true)
   {
     if (is_null($this->_systemTempDirectory) && $create) {
       $sysTmpDir = rtrim(sys_get_temp_dir(), "\\/");
@@ -529,5 +575,116 @@ class JooS_Stream_Wrapper_FS_Partition
     }
     return $this->_systemTempDirectory;
   }
+  
+  /**
+   * Commit changes into real FS
+   * 
+   * Если удалено и не существовало с самого начала
+   * - ничего не делаем
+   * Иначе если когда-то не существовало
+   * - удаляем всё RДерево
+   * - Если сейчас существует, то
+   *   - переносим всё VДерево
+   * Иначе если это файл, то
+   * - удаляем RФайл
+   * - копируем VФайл на место RФайла
+   * 
+   * По всем subtree
+   * - сделать тоже самое, если не было собственных изменений
+   * 
+   * @param JooS_Stream_Wrapper_FS_Changes $changes Changes in FS
+   * @param string $path Path to commit
+   * 
+   * @return null
+   */
+  private function _commit(JooS_Stream_Wrapper_FS_Changes $changes, $path = "")
+  {
+    $root = $this->getRoot()
+      ->path();
     
+    if ($path) {
+      $path .= "/";
+    }
+    
+    $own = $changes->own();
+    foreach ($own as $filename => $vEntity) {
+      $filepath = $path . $filename;
+      $rPath = $root . "/" . $filepath;
+      
+      /* @var $vEntity JooS_Stream_Entity_Virtual_Interface */
+      $vExists = $vEntity->file_exists();
+      $rDeleted = false;
+      
+      $rEntity = $vEntity;
+      do {
+        $rEntity = $rEntity->getRealEntity();
+        $rDeleted = $rDeleted || !$rEntity->file_exists();
+      } while ($rEntity instanceof JooS_Stream_Entity_Virtual_Interface);
+      /* @var $rEntity JooS_Stream_Entity */
+      $rExists = $rEntity->file_exists();
+      if ($rExists && !$vExists) {
+        $rDeleted = true;
+      }
+
+//      echo "\n$filepath\n";
+      if (!$vExists && !$rExists) {
+//        echo "* not exists before and after\n";
+        continue;
+      } elseif ($rDeleted) {
+        if ($rExists) {
+//          echo "* exist before\n";
+          $this->_deleteFileOrDirectory($rPath);
+        }
+        if ($vExists) {
+//          echo "* exist after\n";
+          $this->_copyChanges($filepath);
+        }
+      } else {
+//        echo "* exist but was changed\n";
+        /* @var $vEntity JooS_Stream_Entity_Virtual */
+        if ($vEntity->is_file()) {
+          unlink($rPath);
+          copy($vEntity->path(), $rPath);
+        }
+      }
+    }
+    
+    $subtrees = $changes->sublists();
+    foreach ($subtrees as $filename => $tree) {
+      /* @var $tree JooS_Stream_Wrapper_FS_Changes */
+      if (!isset($own[$filename])) {
+        $this->_commit($tree, $path . $filename);
+      }
+    }
+    
+  }
+  
+  /**
+   * Copy new virtual files to real fs
+   * 
+   * @param string $path Path
+   * 
+   * @return null
+   */
+  private function _copyChanges($path)
+  {
+    $entity = $this->getEntity($path);
+    $source = $entity->path();
+    
+    $root = $this->getRoot()->path();
+    $destination = $root . "/" . $path;
+    
+    if ($entity->is_file()) {
+      copy($source, $destination);
+    } else {
+      $mode = fileperms($source);
+      mkdir($destination, $mode);
+      
+      $list = $this->getList($path);
+      foreach ($list as $file) {
+        /* @var $file JooS_Stream_Entity_Interface */
+        $this->_copyChanges($path . "/" . $file->basename());
+      }
+    }
+  }
 }

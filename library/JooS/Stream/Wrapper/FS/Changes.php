@@ -8,7 +8,7 @@
 /**
  * Partition changes, tree data.
  */
-class JooS_Stream_Wrapper_FS_Partition_Changes
+class JooS_Stream_Wrapper_FS_Changes
 {
   /**
    * @var array
@@ -237,6 +237,16 @@ class JooS_Stream_Wrapper_FS_Partition_Changes
       
     }
     return $subtree;
+  }
+  
+  /**
+   * Return a list of own subtrees
+   * 
+   * @return array
+   */
+  public function sublists()
+  {
+    return $this->_subTrees;
   }
   
   /**

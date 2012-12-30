@@ -8,16 +8,5 @@
   <depends><![CDATA[
     JooS >= 2.0.0.0
   ]]></depends>
-  
-  <add>
-    <?install
-      copy();
-    ?>
-  </add>
-  <delete>
-    <?remove
-      cleanup();
-    ?>
-  </delete>
 </package>
 </control>

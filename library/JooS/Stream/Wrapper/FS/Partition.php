@@ -4,6 +4,7 @@
  * @package JooS
  * @subpackage Stream
  */
+require_once "JooS/Helper/Subject.php";
 
 /**
  * Filesystem tree.
@@ -12,7 +13,7 @@
  *        1) изменение/удаление реальных файлов
  *        2) создание файлов/каталогов в реальных каталогов
  */
-class JooS_Stream_Wrapper_FS_Partition
+class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
 {
   
   /**
@@ -26,33 +27,27 @@ class JooS_Stream_Wrapper_FS_Partition
   private $_changes = null;
   
   /**
+   * @var JooS_Files
+   */
+  private $_files;
+  
+  /**
    * Constructor
    * 
    * @param JooS_Stream_Entity_Interface $content Folder
    */
   public function __construct(JooS_Stream_Entity_Interface $content = null)
   {
+    $this->_files = $this->helperBroker()->Files;
+    
     if (is_null($content)) {
-      $folder = $this->_makeDirectory(0777);
+      $folder = $this->_files->mkdir(0777);
       
       require_once "JooS/Stream/Entity.php";
       
       $content = JooS_Stream_Entity::newInstance($folder);
     }
     $this->setRoot($content);
-  }
-  
-  /**
-   * Destructor
-   * 
-   * @see http://www.refreshinglyblue.com/2008/11/26/recursively-delete-a-non-empty-directory-with-php5/
-   */
-  public function __destruct()
-  {
-    $dir = $this->_getSystemTempDirectory(false);
-    if (!is_null($dir)) {
-      $this->_deleteFileOrDirectory($dir);
-    }
   }
   
   /**
@@ -274,7 +269,7 @@ class JooS_Stream_Wrapper_FS_Partition
     $entity = $this->getEntity($path);
     if (!is_null($entity)) {
       if (!$entity->file_exists()) {
-        $tmpPath = $this->_makeDirectory($mode);
+        $tmpPath = $this->_files->mkdir($mode);
         
         require_once "JooS/Stream/Entity/Virtual.php";
         
@@ -396,7 +391,7 @@ class JooS_Stream_Wrapper_FS_Partition
       } else {
         require_once "JooS/Stream/Entity/Virtual.php";
 
-        $tmpPath = $this->_getUniqueFilename();
+        $tmpPath = $this->_files->tempnam();
         copy($srcEntity->path(), $tmpPath);
         
         $dstEntity = JooS_Stream_Entity_Virtual::newInstance(
@@ -445,7 +440,7 @@ class JooS_Stream_Wrapper_FS_Partition
           $isVirtual = ($entity instanceof JooS_Stream_Entity_Virtual_Interface);
           if (!$exists || !$isVirtual) {
             /* @var $entity JooS_Stream_Entity */
-            $tmpPath = $this->_getUniqueFilename();
+            $tmpPath = $this->_files->tempnam();
             $basename = basename($path);
 
             if ($exists) {
@@ -495,97 +490,6 @@ class JooS_Stream_Wrapper_FS_Partition
     
       $this->_changes = null;
     }
-  }
-  
-  /**
-   * Creates directory in sys_get_temp_dir()
-   * 
-   * @param int $mode Mode
-   * 
-   * @return string
-   */
-  protected function _makeDirectory($mode)
-  {
-    $name = $this->_getUniqueFilename();
-    mkdir($name, $mode);
-    
-    return $name;
-  }
-
-  /**
-   * Delete file or directory
-   * 
-   * @param string $path Path
-   * 
-   * @return null
-   */
-  private function _deleteFileOrDirectory($path)
-  {
-    if (is_file($path)) {
-      unlink($path);
-    } else {
-      $iteratorRd = new RecursiveDirectoryIterator($path);
-      $iteratorRi = new RecursiveIteratorIterator(
-        $iteratorRd, RecursiveIteratorIterator::CHILD_FIRST
-      );
-      foreach ($iteratorRi as $file) {
-        /* @var $file SplFileInfo */
-        if ($file->isDir()) {
-          rmdir($file->getPathname());
-        } else {
-          unlink($file->getPathname());
-        }
-      }
-      rmdir($path);
-    }
-  }
-  
-  private $_uniqueFilenameCounter = 0;
-  
-  /**
-   * Return unique filename
-   *
-   * @return string
-   */
-  protected function _getUniqueFilename()
-  {
-    $sysTempDir = $this->_getSystemTempDirectory();
-    do {
-      $this->_uniqueFilenameCounter++;
-      $name = $sysTempDir . "/" . $this->_uniqueFilenameCounter;
-    } while (file_exists($name));
-    
-    return $name;
-  }
-  
-  /**
-   * @var string
-   */
-  private $_systemTempDirectory = null;
-  
-  /**
-   * Return path to own temp directory
-   * 
-   * @param boolean $create Create new folder ?
-   * 
-   * @return string
-   */
-  private function _getSystemTempDirectory($create = true)
-  {
-    if (is_null($this->_systemTempDirectory) && $create) {
-      $sysTmpDir = rtrim(sys_get_temp_dir(), "\\/");
-      /**
-       * @todo надо наверное как-то ограничить количество итераций
-       * @todo а с другой стороны - это не протестируешь =(
-       */
-      do {
-        $name = $sysTmpDir . "/" . uniqid("fs", true);
-      } while (file_exists($name));
-
-      mkdir($name, 0777);
-      $this->_systemTempDirectory = $name;
-    }
-    return $this->_systemTempDirectory;
   }
   
   /**
@@ -642,7 +546,7 @@ class JooS_Stream_Wrapper_FS_Partition
         continue;
       } elseif ($rDeleted) {
         if ($rExists) {
-          $this->_deleteFileOrDirectory($rPath);
+          $this->_files->delete($rPath);
         }
         if ($vExists) {
           $this->_copyChanges($filepath);
@@ -694,4 +598,17 @@ class JooS_Stream_Wrapper_FS_Partition
       }
     }
   }
+  
+  private $_helperBroker = null;
+
+  public function helperBroker()
+  {
+    if ($this->_helperBroker === null) {
+      require_once "JooS/Helper/Broker.php";
+
+      $this->_helperBroker = JooS_Helper_Broker::newInstance($this);
+    }
+    return $this->_helperBroker;
+  }
+  
 }

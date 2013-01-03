@@ -599,8 +599,16 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
     }
   }
   
+  /**
+   * @var JooS_Helper_Broker
+   */
   private $_helperBroker = null;
 
+  /**
+   * creates Helper Broker for object
+   * 
+   * @return JooS_Helper_Broker
+   */
   public function helperBroker()
   {
     if ($this->_helperBroker === null) {

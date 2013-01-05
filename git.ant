@@ -23,7 +23,7 @@
     </sequential>
   </macrodef>
 
-  <target name="git-pull" depends="git-clone" if="git.available" description="git pull">
+  <target name="git-pull" depends="git-clone" if="git.available">
     <git command="pull" dir="${git.dir}">
       <args>
         <arg value="${git.remote}" />

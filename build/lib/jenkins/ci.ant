@@ -10,17 +10,17 @@
   <property name="CI.phpmd" value="phpmd" />
   <property name="CI.phpcpd" value="phpcpd" />
   <property name="CI.phpcs" value="phpcs" />
-  <property name="CI.phpdoc" value="phpdoc" />
+  <property name="CI.phpdox" value="phpdox" />
   <property name="CI.phploc" value="phploc" />
   <property name="CI.phpunit" value="phpunit" />
   <property name="CI.phpcb" value="phpcb" />
   
-  <target name="CI-build" depends="CI-clean" description="Run pdepend, phpmd, phpcpd, phpcs, phpdoc, phploc, phpunit, phpcb">
+  <target name="CI-build" depends="CI-clean" description="Run pdepend, phpmd, phpcpd, phpcs, phpdox, phploc, phpunit, phpcb">
     <antcall target="CI-pdepend" />
     <antcall target="CI-phpmd" />
     <antcall target="CI-phpcpd" />
     <antcall target="CI-phpcs" />
-    <antcall target="CI-phpdoc" />
+    <antcall target="CI-phpdox" />
     <antcall target="CI-phploc" />
     <antcall target="CI-phpunit" />
     <antcall target="CI-phpcb" />
@@ -81,18 +81,9 @@
     </exec>
   </target>
   
-  <!-- Generate API documentation using PHPDocumentor -->
-  <target name="CI-phpdoc">
-    <exec executable="${CI.phpdoc}" dir="${CI.dir}">
-      <arg value="--templatebase" />
-      <arg value="${lib.path.jenkins}/phpdoc" />
-      <arg value="--output" />
-      <arg value="HTML:frames:utf8" />
-      <arg value="--directory" />
-      <arg value="${CI.source}" />
-      <arg value="--target" />
-      <arg value="api" />
-    </exec>
+  <!-- Generate API documentation using phpDox -->
+  <target name="CI-phpdox">
+    <exec executable="${CI.phpdox}" dir="${CI.basedir}" />
   </target>
   
   <!-- Generate phploc.csv -->

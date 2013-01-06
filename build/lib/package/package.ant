@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="package">
+<project>
   
   <property name="system.php" value="php" />
   <property name="CI.phpackager.target" value="${HOME_DIR}/target" />

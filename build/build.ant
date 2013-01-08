@@ -9,11 +9,7 @@
   <import file="${lib.path.required}/required.ant" />
   <import file="${lib.path.package}/package.ant" />
   
-  <target name="init" unless="required.JooS_Stream.loaded">
-    <antcall target="required-download-all">
-      <param name="repo.list" value="JooS" />
-    </antcall>
-    
+  <target name="init" depends="required-download-all" unless="required.JooS_Stream.loaded">
     <echo message="${ant.project.name} Init - OK" />
   </target>
 </project>

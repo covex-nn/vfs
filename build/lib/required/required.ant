@@ -44,4 +44,17 @@
     </if>
     
   </target>
+  
+  <target name="required-download-all">
+    <for list="${repo.list}" param="repo.name">
+      <sequential>
+        <antcall target="required-download">
+          <param name="required.started" value="${required.started}" />
+          <param name="repo.dir" value="@{repo.name}" />
+          <param name="repo.url" value="${required.@{repo.name}}" />
+        </antcall>
+        <var name="required.started" value="true" />
+      </sequential>
+    </for>
+  </target>
 </project>

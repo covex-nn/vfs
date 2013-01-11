@@ -3,6 +3,7 @@
   <property name="required.dir" value="external" />
   <property name="required.path" value="${HOME_DIR}/${required.dir}" />
   <property name="required.started" value="false" />
+  <property name="required.basedir" value="${basedir}" />
   
   <target name="required-download">
     <mkdir dir="${required.path}" />
@@ -11,7 +12,7 @@
       <equals arg1="${required.started}" arg2="true" />
       <then></then>
       <else>
-        <echo message="required.started=1${line.separator}" file="${required.path}/external.properties" />
+        <echo message="required.started=true${line.separator}" file="${required.path}/external.properties" />
       </else>
     </if>
     <property file="${required.path}/external.properties" />
@@ -32,10 +33,9 @@
         </antcall>
 
         <ant antfile="${required.path}/${repo.dir}/build/build.ant" target="init" inheritAll="false" inheritRefs="false">
+          <property name="required.basedir" value="${required.basedir}" />
           <property name="required.path" value="${required.path}" />
-          <property name="required.started" value="true" />
-          <property file="${basedir}/${repo.dir}.local.properties" />
-          <property file="${basedir}/${repo.dir}.properties" />
+          <property file="${required.basedir}/build.required.properties" />
           <property file="${required.path}/external.properties" />
         </ant>
         

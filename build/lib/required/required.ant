@@ -26,10 +26,20 @@
         <mkdir dir="${required.path}/${repo.dir}" />
         <echo message="required.${repo.dir}.loading=true${line.separator}" file="${required.path}/external.properties" append="true" />
         
+        <var name="required.branch" unset="true" />
+        <if>
+          <isset property="required.${repo.dir}.branch" />
+          <then>
+            <propertycopy property="required.branch" from="required.${repo.dir}.branch" />
+          </then>
+          <else>
+            <property name="required.branch" value="master" />
+          </else>
+        </if>
         <antcall target="git-pull">
           <param name="git.dir" value="${required.path}/${repo.dir}" />
           <param name="git.repository" value="${repo.url}" />
-          <param name="git.branch" value="master" />
+          <param name="git.branch" value="${required.branch}" />
         </antcall>
 
         <ant antfile="${required.path}/${repo.dir}/build/build.ant" target="init" inheritAll="false" inheritRefs="false">

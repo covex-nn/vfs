@@ -55,7 +55,7 @@
     
   </target>
   
-  <target name="required-download-all">
+  <target name="required-download-all" depends="required-create-properties">
     <for list="${repo.list}" param="repo.name">
       <sequential>
         <antcall target="required-download">
@@ -66,5 +66,30 @@
         <var name="required.started" value="true" />
       </sequential>
     </for>
+  </target>
+  
+  <target name="required-create-properties">
+    <if>
+      <isset property="repo.list.jenkins" />
+      <then>
+        <delete file="${basedir}/build.required.properties" />
+        <for list="${repo.list.jenkins}" param="repo.name">
+          <sequential>
+            <if>
+              <isset property="required.@{repo.name}" />
+              <then>
+                <echo message="required.@{repo.name}=${required.@{repo.name}}${line.separator}" file="${basedir}/build.required.properties" append="true" />
+              </then>
+            </if>
+            <if>
+              <isset property="required.@{repo.name}.branch" />
+              <then>
+                <echo message="required.@{repo.name}.branch=${required.@{repo.name}.branch}${line.separator}" file="${basedir}/build.required.properties" append="true" />
+              </then>
+            </if>
+          </sequential>
+        </for>
+      </then>
+    </if>
   </target>
 </project>

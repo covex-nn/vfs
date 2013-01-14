@@ -1,8 +1,13 @@
 <?php
 
+namespace JooS\Stream;
+
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 require_once "JooS/Stream/Wrapper/FS.php";
 
-class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
+class Wrapper_FSTest extends \PHPUnit_Framework_TestCase
 {
 
   /**
@@ -10,7 +15,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
    */
   public function testGetRelativePath($url)
   {
-    $this->assertEquals("dir1/dir2", JooS_Stream_Wrapper_FS::getRelativePath($url));
+    $this->assertEquals("dir1/dir2", Wrapper_FS::getRelativePath($url));
   }
 
   public function providerGetRelativePath()
@@ -171,7 +176,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
   {
     $this->_streamStart();
     
-    $commit = JooS_Stream_Wrapper_FS::commit("joos-test");
+    $commit = Wrapper_FS::commit("joos-test");
     $this->assertTrue($commit);
 
     $this->_streamStop();
@@ -179,7 +184,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
   
   public function testCommit2()
   {
-    $commit1 = JooS_Stream_Wrapper_FS::commit("joos-test-not-a-protocol");
+    $commit1 = Wrapper_FS::commit("joos-test-not-a-protocol");
     $this->assertFalse($commit1);
 
     $this->_streamStart(null, "joos1-test");
@@ -211,7 +216,7 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     mkdir("joos2-test://dir4");
     file_put_contents("joos2-test://dir4/file4.txt", "file4");
 
-    $commit2 = JooS_Stream_Wrapper_FS::commit("joos2-test");
+    $commit2 = Wrapper_FS::commit("joos2-test");
     $this->assertTrue($commit2);
 
     $this->_streamStop("joos2-test");
@@ -282,12 +287,12 @@ class JooS_Stream_Wrapper_FSTest extends PHPUnit_Framework_TestCase
     if (in_array($protocol, stream_get_wrappers())) {
       $this->_streamStop();
     }
-    JooS_Stream_Wrapper_FS::register($protocol, $dir);
+    Wrapper_FS::register($protocol, $dir);
   }
 
   protected function _streamStop($protocol = "joos-test")
   {
-    JooS_Stream_Wrapper_FS::unregister($protocol);
+    Wrapper_FS::unregister($protocol);
   }
 
 }

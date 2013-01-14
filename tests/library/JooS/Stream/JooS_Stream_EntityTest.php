@@ -1,8 +1,10 @@
 <?php
 
+namespace JooS\Stream;
+
 require_once "JooS/Stream/Entity.php";
 
-class JooS_Stream_EntityTest extends PHPUnit_Framework_TestCase
+class EntityTest extends \PHPUnit_Framework_TestCase
 {
 
   /**
@@ -10,7 +12,7 @@ class JooS_Stream_EntityTest extends PHPUnit_Framework_TestCase
    */
   public function testFixPath($path)
   {
-    $this->assertEquals("dir1/dir2", JooS_Stream_Entity::fixPath($path));
+    $this->assertEquals("dir1/dir2", Entity::fixPath($path));
   }
 
   public function providerGetRelativePath()
@@ -26,7 +28,7 @@ class JooS_Stream_EntityTest extends PHPUnit_Framework_TestCase
   
   public function testInstance()
   {
-    $instance = JooS_Stream_Entity::newInstance(__FILE__);
+    $instance = Entity::newInstance(__FILE__);
 
     $this->assertEquals(basename(__FILE__), $instance->basename());
 

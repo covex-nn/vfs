@@ -4,11 +4,12 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
 
 /**
  * FS stream wrapper interface
  */
-interface JooS_Stream_Wrapper_FS_Interface
+interface Wrapper_FS_Interface
 {
   /**
    * Retrieve information about a file
@@ -31,7 +32,6 @@ interface JooS_Stream_Wrapper_FS_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.mkdir.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function mkdir($path, $mode, $options);
   
@@ -80,7 +80,6 @@ interface JooS_Stream_Wrapper_FS_Interface
    * 
    * @link http://www.php.net/manual/en/streamwrapper.dir-opendir.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_opendir($path);
   
@@ -91,7 +90,6 @@ interface JooS_Stream_Wrapper_FS_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.dir-readdir.php
    * @return string
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_readdir();
   
@@ -104,7 +102,6 @@ interface JooS_Stream_Wrapper_FS_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.dir-closedir.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_closedir();
   
@@ -119,7 +116,6 @@ interface JooS_Stream_Wrapper_FS_Interface
    *
    * @link http://www.php.net/manual/en/streamwrapper.dir-rewinddir.php
    * @return boolean
-   * @todo JooS_Stream_Wrapper_FS
    */
   public function dir_rewinddir();
 

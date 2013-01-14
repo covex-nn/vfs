@@ -4,11 +4,12 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
 
 /**
  * Stream exception.
  */
-class JooS_Stream_Exception extends \Exception
+class Exception extends \Exception
 {
   
 }

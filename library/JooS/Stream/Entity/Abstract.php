@@ -4,12 +4,14 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
+
 require_once "JooS/Stream/Entity/Interface.php";
 
 /**
  * Stream Entity.
  */
-abstract class JooS_Stream_Entity_Abstract implements JooS_Stream_Entity_Interface
+abstract class Entity_Abstract implements Entity_Interface
 {
   /**
    * @var string

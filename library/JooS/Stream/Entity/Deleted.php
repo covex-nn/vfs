@@ -4,6 +4,8 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
+
 require_once "JooS/Stream/Entity/Virtual.php";
 
 require_once "JooS/Stream/Entity/Deleted/Interface.php";
@@ -11,29 +13,28 @@ require_once "JooS/Stream/Entity/Deleted/Interface.php";
 /**
  * Deleted stream entity
  */
-class JooS_Stream_Entity_Deleted extends JooS_Stream_Entity_Abstract
-  implements JooS_Stream_Entity_Deleted_Interface
+class Entity_Deleted extends Entity_Abstract implements Entity_Deleted_Interface
 {
   
   /**
-   * @var JooS_Stream_Entity_Interface
+   * @var Entity_Interface
    */
   protected $_realEntity;
   
   /**
    * Create new virtual stream entity
    * 
-   * @param JooS_Stream_Entity_Interface $realEntity Real stream entity
+   * @param Entity_Interface $realEntity Real stream entity
    * 
-   * @return JooS_Stream_Entity_Deleted
+   * @return Entity_Deleted
    */
-  public static function newInstance(JooS_Stream_Entity_Interface $realEntity)
+  public static function newInstance(Entity_Interface $realEntity)
   {
     $basename = $realEntity->basename();
     $path = $realEntity->path();
     
     $instance = new static($basename, $path);
-    /* @var $instance JooS_Stream_Entity_Deleted */
+    /* @var $instance Entity_Deleted */
     $instance->_realEntity = $realEntity;
     
     return $instance;
@@ -42,7 +43,7 @@ class JooS_Stream_Entity_Deleted extends JooS_Stream_Entity_Abstract
   /**
    * Return saved old entity
    * 
-   * @return JooS_Stream_Entity_Interface
+   * @return Entity_Interface
    */
   public function getRealEntity()
   {

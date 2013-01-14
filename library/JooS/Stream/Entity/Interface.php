@@ -4,22 +4,15 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
 
 /**
  * Interface for all stream entities.
  * 
  * @todo описать функции-операции над сущностью
  */
-interface JooS_Stream_Entity_Interface
+interface Entity_Interface
 {
-
-  const NONE = "None";
-
-  const FILE = "File";
-
-  const DIR = "Dir";
-
-  const UNKNOWN = "Unknown";
 
   /**
    * File exists ?

@@ -1,8 +1,10 @@
 <?php
 
+namespace JooS\Stream;
+
 require_once "JooS/Stream/Wrapper.php";
 
-class JooS_Stream_WrapperTest extends PHPUnit_Framework_TestCase
+class WrapperTest extends \PHPUnit_Framework_TestCase
 {
 
   protected $protocol = null;
@@ -11,22 +13,22 @@ class JooS_Stream_WrapperTest extends PHPUnit_Framework_TestCase
   {
     $exceptionsCounter = 0;
 
-    $result2 = JooS_Stream_Wrapper::unregister($this->protocol);
+    $result2 = Wrapper::unregister($this->protocol);
     $this->assertTrue($result2);
 
     try {
-      JooS_Stream_Wrapper::unregister($this->protocol);
-    } catch (JooS_Stream_Wrapper_Exception $e) {
+      Wrapper::unregister($this->protocol);
+    } catch (Wrapper_Exception $e) {
       $exceptionsCounter++;
     }
     $this->assertEquals(1, $exceptionsCounter, "Wrapper must not be registered already");
 
-    $result1 = JooS_Stream_Wrapper::register($this->protocol);
+    $result1 = Wrapper::register($this->protocol);
     $this->assertTrue($result1);
 
     try {
-      JooS_Stream_Wrapper::register($this->protocol);
-    } catch (JooS_Stream_Wrapper_Exception $e) {
+      Wrapper::register($this->protocol);
+    } catch (Wrapper_Exception $e) {
       $exceptionsCounter++;
     }
     $this->assertEquals(2, $exceptionsCounter, "Second wrapper could not be registered");
@@ -42,12 +44,12 @@ class JooS_Stream_WrapperTest extends PHPUnit_Framework_TestCase
       $this->protocol = uniqid("stream");
     }
 
-    JooS_Stream_Wrapper::register($this->protocol);
+    Wrapper::register($this->protocol);
   }
 
   protected function tearDown()
   {
-    JooS_Stream_Wrapper::unregister($this->protocol);
+    Wrapper::unregister($this->protocol);
   }
 
 }

@@ -4,6 +4,8 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
+
 require_once "JooS/Stream/Entity/Abstract.php";
 
 require_once "JooS/Stream/Entity/Virtual/Interface.php";
@@ -11,32 +13,31 @@ require_once "JooS/Stream/Entity/Virtual/Interface.php";
 /**
  * Virtual stream entity
  */
-class JooS_Stream_Entity_Virtual  extends JooS_Stream_Entity_Abstract
-  implements JooS_Stream_Entity_Virtual_Interface
+class Entity_Virtual  extends Entity_Abstract implements Entity_Virtual_Interface
 {
   
   /**
-   * @var JooS_Stream_Entity_Interface
+   * @var Entity_Interface
    */
   protected $_realEntity;
   
   /**
    * Create new virtual stream entity
    * 
-   * @param JooS_Stream_Entity_Interface $realEntity Real stream entity
-   * @param string                       $path       Tmp path
-   * @param string                       $basename   Optional basename
+   * @param Entity_Interface $entity Real stream entity
+   * @param string           $path   Tmp path
+   * @param string           $name   Optional basename
    * 
-   * @return JooS_Stream_Entity_Virtual
+   * @return Entity_Virtual
    */
-  public static function newInstance(JooS_Stream_Entity_Interface $realEntity, $path, $basename = null)
+  public static function newInstance(Entity_Interface $entity, $path, $name = null)
   {
-    if (is_null($basename)) {
-      $basename = $realEntity->basename();
+    if (is_null($name)) {
+      $name = $entity->basename();
     }
-    $instance = new static($basename, $path);
+    $instance = new static($name, $path);
     /* @var $instance JooS_Stream_Entity_Virtual */
-    $instance->_realEntity = $realEntity;
+    $instance->_realEntity = $entity;
     
     return $instance;
   }
@@ -44,7 +45,7 @@ class JooS_Stream_Entity_Virtual  extends JooS_Stream_Entity_Abstract
   /**
    * Return saved old entity
    * 
-   * @return JooS_Stream_Entity_Interface
+   * @return Entity_Interface
    */
   public function getRealEntity()
   {

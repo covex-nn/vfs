@@ -4,6 +4,12 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
+
+use JooS\Helper\Subject as Helper_Subject;
+use JooS\Helper\Broker as Helper_Broker;
+use JooS\Files;
+
 require_once "JooS/Helper/Subject.php";
 
 /**
@@ -13,30 +19,30 @@ require_once "JooS/Helper/Subject.php";
  *        1) изменение/удаление реальных файлов
  *        2) создание файлов/каталогов в реальных каталогов
  */
-class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
+class Wrapper_FS_Partition implements Helper_Subject
 {
   
   /**
-   * @var JooS_Stream_Entity
+   * @var Entity
    */
   private $_root = null;
   
   /**
-   * @var JooS_Stream_Wrapper_FS_Changes
+   * @var Wrapper_FS_Changes
    */
   private $_changes = null;
   
   /**
-   * @var JooS_Files
+   * @var Files
    */
   private $_files;
   
   /**
    * Constructor
    * 
-   * @param JooS_Stream_Entity_Interface $content Folder
+   * @param Entity_Interface $content Folder
    */
-  public function __construct(JooS_Stream_Entity_Interface $content = null)
+  public function __construct(Entity_Interface $content = null)
   {
     $this->_files = $this->helperBroker()->Files;
     
@@ -45,7 +51,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       
       require_once "JooS/Stream/Entity.php";
       
-      $content = JooS_Stream_Entity::newInstance($folder);
+      $content = Entity::newInstance($folder);
     }
     $this->setRoot($content);
   }
@@ -53,7 +59,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
   /**
    * Return root of filesystem
    * 
-   * @return JooS_Stream_Entity
+   * @return Entity
    */
   public function getRoot()
   {
@@ -63,17 +69,17 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
   /**
    * Init root
    * 
-   * @param JooS_Stream_Entity_Interface $entity Folder
+   * @param Entity_Interface $entity Folder
    * 
    * @return null
-   * @throws JooS_Stream_Wrapper_FS_Exception
+   * @throws Wrapper_FS_Exception
    */
-  protected function setRoot(JooS_Stream_Entity_Interface $entity)
+  protected function setRoot(Entity_Interface $entity)
   {
     if (!$entity->file_exists() || !$entity->is_dir()) {
       require_once "JooS/Stream/Wrapper/FS/Exception.php";
       
-      throw new JooS_Stream_Wrapper_FS_Exception(
+      throw new Wrapper_FS_Exception(
         "Root folder is not valid"
       );
     }
@@ -84,14 +90,14 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
   /**
    * Return FS-changes object
    * 
-   * @return JooS_Stream_Wrapper_FS_Changes
+   * @return Wrapper_FS_Changes
    */
   protected function getChanges()
   {
     if (is_null($this->_changes)) {
       require_once "JooS/Stream/Wrapper/FS/Changes.php";
 
-      $this->_changes = new JooS_Stream_Wrapper_FS_Changes();
+      $this->_changes = new Wrapper_FS_Changes();
     }
     return $this->_changes;
   }
@@ -101,7 +107,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
    * 
    * @param string $filename Path to file/directory
    * 
-   * @return JooS_Stream_Entity_Interface
+   * @return Entity_Interface
    */
   public function getEntity($filename)
   {
@@ -109,7 +115,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
     
     require_once "JooS/Stream/Entity.php";
     
-    $filename = JooS_Stream_Entity::fixPath($filename);
+    $filename = Entity::fixPath($filename);
     $parts = explode("/", $filename);
     $basename = array_pop($parts);
     
@@ -150,7 +156,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
     if ($changes->exists($filename)) {
       $entity = $changes->get($filename);
     } else {
-      $entity = JooS_Stream_Entity::newInstance(
+      $entity = Entity::newInstance(
         $directory->path() .
         ($partiallyFilepath ? "/" . $partiallyFilepath : "") .
         "/" . $basename
@@ -175,7 +181,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       $changes = $this->getChanges();
       $own = $changes->own($path);
 
-      if (!($entity instanceof JooS_Stream_Entity_Virtual_Interface)) {
+      if (!($entity instanceof Entity_Virtual_Interface)) {
         $directory = $this->getRoot();
         $directoryPath = $directory->path() . "/" . $path;
         
@@ -195,7 +201,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
             if (isset($own[$changesKey])) {
               continue;
             } else {
-              $files[$changesKey] = JooS_Stream_Entity::newInstance($changesKey);
+              $files[$changesKey] = Entity::newInstance($changesKey);
             }
           }
           closedir($dirHandler);
@@ -203,8 +209,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       }
       
       foreach ($own as $changesKey => $file) {
-        /* @var $file JooS_Stream_Entity_Interface */
-        if ($file instanceof JooS_Stream_Entity_Deleted_Interface) {
+        /* @var $file Entity_Interface */
+        if ($file instanceof Entity_Deleted_Interface) {
           unset($own[$changesKey]);
         }
       }
@@ -234,7 +240,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
     
     if (is_null($entity)) {
       $path = null;
-    } elseif ($entity instanceof JooS_Stream_Entity_Deleted_Interface) {
+    } elseif ($entity instanceof Entity_Deleted_Interface) {
       $path = null;
     } elseif (!$entity->file_exists()) {
       $path = null;
@@ -260,7 +266,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
    * @param int    $mode    Mode
    * @param int    $options Options
    * 
-   * @return JooS_Stream_Entity_Interface
+   * @return Entity_Interface
    */
   public function makeDirectory($path, $mode, $options)
   {
@@ -273,7 +279,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
         
         require_once "JooS/Stream/Entity/Virtual.php";
         
-        $result = JooS_Stream_Entity_Virtual::newInstance($entity, $tmpPath);
+        $result = Entity_Virtual::newInstance($entity, $tmpPath);
         
         $changes = $this->getChanges();
         $changes->add($path, $result);
@@ -297,7 +303,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
    * @param string $path    Path to directory
    * @param int    $options Stream options
    * 
-   * @return JooS_Stream_Entity_Deleted
+   * @return Entity_Deleted
    */
   public function removeDirectory($path, $options)
   {
@@ -311,7 +317,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       
       require_once "JooS/Stream/Entity/Deleted.php";
 
-      $result = JooS_Stream_Entity_Deleted::newInstance($entity);
+      $result = Entity_Deleted::newInstance($entity);
       
       $changes = $this->getChanges();
       $changes->add($path, $result);
@@ -331,7 +337,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
    * 
    * @param string $path Path
    * 
-   * @return JooS_Stream_Entity_Deleted
+   * @return Entity_Deleted
    */
   public function deleteFile($path)
   {
@@ -344,7 +350,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
     } else {
       require_once "JooS/Stream/Entity/Deleted.php";
 
-      $result = JooS_Stream_Entity_Deleted::newInstance($entity);
+      $result = Entity_Deleted::newInstance($entity);
       
       $changes = $this->getChanges();
       $changes->add($path, $result);
@@ -359,7 +365,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
    * @param string $srcPath Source path
    * @param string $dstPath Destination path
    * 
-   * @return JooS_Stream_Entity_Virtual
+   * @return Entity_Virtual
    */
   public function rename($srcPath, $dstPath)
   {
@@ -380,7 +386,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
         $list = $this->getList($srcPath);
         if (sizeof($list)) {
           foreach ($list as $file) {
-            /* @var $file JooS_Stream_Entity_Interface */
+            /* @var $file Entity_Interface */
             $filename = $file->basename();
             $this->rename(
               $srcPath . "/" . $filename, 
@@ -394,7 +400,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
         $tmpPath = $this->_files->tempnam();
         copy($srcEntity->path(), $tmpPath);
         
-        $dstEntity = JooS_Stream_Entity_Virtual::newInstance(
+        $dstEntity = Entity_Virtual::newInstance(
           $dstEntity, $tmpPath, $dstEntity->basename()
         );
         $changes->add($dstPath, $dstEntity);
@@ -402,7 +408,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       
       require_once "JooS/Stream/Entity/Deleted.php";
 
-      $srcEntity = JooS_Stream_Entity_Deleted::newInstance($srcEntity);
+      $srcEntity = Entity_Deleted::newInstance($srcEntity);
       $changes->add($srcPath, $srcEntity);
 
       $result = $dstEntity;
@@ -413,10 +419,10 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
   /**
    * Opens file or URL
    *
-   * @param string                       $path    Path
-   * @param string                       $mode    Mode
-   * @param int                          $options Options
-   * @param JooS_Stream_Entity_Interface &$entity Opened entity
+   * @param string           $path    Path
+   * @param string           $mode    Mode
+   * @param int              $options Options
+   * @param Entity_Interface &$entity Opened entity
    * 
    * @return resource
    * @link http://php.net/manual/en/function.fopen.php
@@ -437,9 +443,9 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
         $fopenWillFail = false;
         $mode = strtolower($mode);
         if ($mode != "r") {
-          $isVirtual = ($entity instanceof JooS_Stream_Entity_Virtual_Interface);
+          $isVirtual = ($entity instanceof Entity_Virtual_Interface);
           if (!$exists || !$isVirtual) {
-            /* @var $entity JooS_Stream_Entity */
+            /* @var $entity Entity */
             $tmpPath = $this->_files->tempnam();
             $basename = basename($path);
 
@@ -453,7 +459,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
             if (!$fopenWillFail) {
               require_once "JooS/Stream/Entity/Virtual.php";
 
-              $entity = JooS_Stream_Entity_Virtual::newInstance(
+              $entity = Entity_Virtual::newInstance(
                 $entity, $tmpPath, $basename
               );
               
@@ -508,12 +514,12 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
    * По всем subtree
    * - сделать тоже самое, если не было собственных изменений
    * 
-   * @param JooS_Stream_Wrapper_FS_Changes $changes Changes in FS
-   * @param string                         $path    Path to commit
+   * @param Wrapper_FS_Changes $changes Changes in FS
+   * @param string             $path    Path to commit
    * 
    * @return null
    */
-  private function _commit(JooS_Stream_Wrapper_FS_Changes $changes, $path = "")
+  private function _commit(Wrapper_FS_Changes $changes, $path = "")
   {
     $root = $this->getRoot();
     $rootpath = $root->path();
@@ -527,7 +533,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       $filepath = $path . $filename;
       $rPath = $rootpath . "/" . $filepath;
       
-      /* @var $vEntity JooS_Stream_Entity_Virtual_Interface */
+      /* @var $vEntity Entity_Virtual_Interface */
       $vExists = $vEntity->file_exists();
       $rDeleted = false;
       
@@ -535,8 +541,8 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       do {
         $rEntity = $rEntity->getRealEntity();
         $rDeleted = $rDeleted || !$rEntity->file_exists();
-      } while ($rEntity instanceof JooS_Stream_Entity_Virtual_Interface);
-      /* @var $rEntity JooS_Stream_Entity */
+      } while ($rEntity instanceof Entity_Virtual_Interface);
+      /* @var $rEntity Entity */
       $rExists = $rEntity->file_exists();
       if ($rExists && !$vExists) {
         $rDeleted = true;
@@ -552,7 +558,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
           $this->_copyChanges($filepath);
         }
       } else {
-        /* @var $vEntity JooS_Stream_Entity_Virtual */
+        /* @var $vEntity Entity_Virtual */
         if ($vEntity->is_file()) {
           unlink($rPath);
           copy($vEntity->path(), $rPath);
@@ -562,7 +568,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
     
     $subtrees = $changes->sublists();
     foreach ($subtrees as $filename => $tree) {
-      /* @var $tree JooS_Stream_Wrapper_FS_Changes */
+      /* @var $tree Wrapper_FS_Changes */
       if (!isset($own[$filename])) {
         $this->_commit($tree, $path . $filename);
       }
@@ -593,7 +599,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
       
       $list = $this->getList($path);
       foreach ($list as $file) {
-        /* @var $file JooS_Stream_Entity_Interface */
+        /* @var $file Entity_Interface */
         $this->_copyChanges($path . "/" . $file->basename());
       }
     }
@@ -614,7 +620,7 @@ class JooS_Stream_Wrapper_FS_Partition implements JooS_Helper_Subject
     if ($this->_helperBroker === null) {
       require_once "JooS/Helper/Broker.php";
 
-      $this->_helperBroker = JooS_Helper_Broker::newInstance($this);
+      $this->_helperBroker = Helper_Broker::newInstance($this);
     }
     return $this->_helperBroker;
   }

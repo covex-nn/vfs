@@ -4,14 +4,16 @@
  * @package JooS
  * @subpackage Stream
  */
+namespace JooS\Stream;
+
 require_once "JooS/Stream/Wrapper.php";
 
 require_once "JooS/Stream/Wrapper/FS/Interface.php";
+
 /**
  * Stream for local file system
  */
-class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
-  implements JooS_Stream_Wrapper_FS_Interface
+class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
 {
 
   /**
@@ -122,7 +124,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
     if (is_array($files)) {
       $this->_dirFiles = array();
       foreach ($files as $file) {
-        /* @var $file JooS_Stream_Entity_Interface */
+        /* @var $file Entity_Interface */
         $this->_dirFiles[] = $file->basename();
       }
       
@@ -182,7 +184,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
   private $_filePointer;
   
   /**
-   * @var JooS_Stream_Entity_Interface
+   * @var Entity_Interface
    */
   private $_fileEntity;
   
@@ -334,14 +336,14 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
       if (!is_null($root)) {
         require_once "JooS/Stream/Entity.php";
 
-        $content = JooS_Stream_Entity::newInstance($root);
+        $content = Entity::newInstance($root);
       } else {
         $content = null;
       }
 
       require_once "JooS/Stream/Wrapper/FS/Partition.php";
       
-      $partition = new JooS_Stream_Wrapper_FS_Partition($content);
+      $partition = new Wrapper_FS_Partition($content);
       
       self::$_partitions[$protocol] = $partition;
     }
@@ -359,7 +361,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
   {
     if (isset(self::$_partitions[$protocol])) {
       $partition = self::$_partitions[$protocol];
-      /* @var $partition JooS_Stream_Wrapper_FS_Partition */
+      /* @var $partition Wrapper_FS_Partition */
       $partition->commit();
       
       $result = true;
@@ -389,7 +391,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
    * 
    * @param string $url Url
    * 
-   * @return JooS_Stream_Wrapper_FS_Partition
+   * @return Wrapper_FS_Partition
    */
   protected static function getPartition($url)
   {
@@ -414,7 +416,7 @@ class JooS_Stream_Wrapper_FS extends JooS_Stream_Wrapper
 
     require_once "JooS/Stream/Entity.php";
     
-    return JooS_Stream_Entity::fixPath($urlPath);
+    return Entity::fixPath($urlPath);
   }
   
 }

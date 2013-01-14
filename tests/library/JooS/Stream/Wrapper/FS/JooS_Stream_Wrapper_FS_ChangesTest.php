@@ -1,13 +1,15 @@
 <?php
 
+namespace JooS\Stream;
+
 require_once "JooS/Stream/Wrapper/FS/Changes.php";
 
-class JooS_Stream_Wrapper_FS_ChangesTest extends PHPUnit_Framework_TestCase
+class Wrapper_FS_ChangesTest extends \PHPUnit_Framework_TestCase
 {
 
   public function testInterface()
   {
-    $changes = new JooS_Stream_Wrapper_FS_Changes();
+    $changes = new Wrapper_FS_Changes();
 
     $this->assertFalse($changes->exists("qqq/www/eee"));
     $this->assertEquals(null, $changes->get("qqq/www/eee"));
@@ -17,14 +19,14 @@ class JooS_Stream_Wrapper_FS_ChangesTest extends PHPUnit_Framework_TestCase
 
     require_once "JooS/Stream/Entity.php";
 
-    $entity = JooS_Stream_Entity::newInstance(__FILE__);
+    $entity = Entity::newInstance(__FILE__);
 
     $changes->add("qqq/www/eee", $entity);
     
     $sublists1 = $changes->sublists();
     $this->assertEquals(1, sizeof($sublists1["qqq"]));
     $this->assertTrue(isset($sublists1["qqq"]));
-    $this->assertTrue($sublists1["qqq"] instanceof JooS_Stream_Wrapper_FS_Changes);
+    $this->assertTrue($sublists1["qqq"] instanceof Wrapper_FS_Changes);
 
     $this->assertTrue($changes->exists("qqq/www/eee"));
     $this->assertEquals($entity, $changes->get("qqq/www/eee"));

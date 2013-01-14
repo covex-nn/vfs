@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
 <control>
-<package name="JooS_Stream" version="2.0">
+<package name="JooS_Stream" version="3.0">
   <source><![CDATA[
     "library"
   ]]></source>
   
   <depends><![CDATA[
-    JooS >= 2.0
+    JooS >= 3.0
   ]]></depends>
+  
+  <breaks><![CDATA[
+    JooS_Deploy < 3.0
+  ]]></breaks>
 </package>
 </control>

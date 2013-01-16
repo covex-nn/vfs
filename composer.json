@@ -1,0 +1,28 @@
+{
+  "name" : "covex-nn/joos-stream", 
+  "type" : "library", 
+  "require": {
+    "php":">=5.3.3",
+    "covex-nn/joos" : ">=3.0.2"
+  },
+  "repositories" : [
+    {
+      "type":"git", "url": "http://github.com/covex-nn/JooS"
+    }
+  ], 
+  "homepage" : "http://github.com/covex-nn/PHPackager", 
+  "license" : "MIT", 
+  "authors": [
+    {
+      "name" : "Andrey F. Mindubaev", 
+      "email" : "covex.mobile@gmail.com", 
+      "role" : "Developer"
+    }
+  ], 
+  "autoload" : {
+    "psr-0" : {
+      "JooS\\Stream\\" : "library/"
+    }
+  }, 
+  "minimum-stability" : "dev"
+}

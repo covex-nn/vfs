@@ -19,7 +19,8 @@ Example
 
   JooS\Stream\Wrapper_FS::unregister("any-vfs-protocol");
 
-?>```
+?>
+```
 
 
 ## Read more

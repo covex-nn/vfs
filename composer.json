@@ -2,12 +2,12 @@
   "name" : "covex-nn/joos-stream", 
   "type" : "library", 
   "require": {
-    "php":">=5.3.3",
-    "covex-nn/joos" : ">=3.0.2"
+    "php" : ">=5.3.3",
+    "covex-nn/joos" : "3.0.*"
   },
   "repositories" : [
     {
-      "type":"git", "url": "http://github.com/covex-nn/JooS"
+      "type":"git", "url": "git://github.com/covex-nn/JooS.git"
     }
   ], 
   "homepage" : "http://github.com/covex-nn/PHPackager", 
@@ -24,5 +24,7 @@
       "JooS\\Stream\\" : "library/"
     }
   }, 
-  "minimum-stability" : "dev"
+  "include-path" : [
+    "library/"
+  ]
 }

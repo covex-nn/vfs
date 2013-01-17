@@ -21,7 +21,7 @@ Example
 
 ?>```
 
-Read more
----------
+
+## Read more
 
 Please visit [wiki](http://github.com/covex-nn/JooS_Stream/wiki/).

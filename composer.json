@@ -5,12 +5,7 @@
     "php" : ">=5.3.3",
     "covex-nn/joos" : "3.0.*"
   },
-  "repositories" : [
-    {
-      "type":"git", "url": "git://github.com/covex-nn/JooS.git"
-    }
-  ], 
-  "homepage" : "http://github.com/covex-nn/PHPackager", 
+  "homepage" : "http://github.com/covex-nn/JooS_Stream", 
   "license" : "MIT", 
   "authors": [
     {

@@ -1,5 +1,7 @@
 {
   "name" : "covex-nn/joos-stream", 
+  "description" : "PHP stream wrapper, transactional virtual file system", 
+  "keywords" : [ "streaming", "wrapper", "phpunit", "testing", "mock file system" ], 
   "type" : "library", 
   "require": {
     "php" : ">=5.3.3",

@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-  
   <property name="system.php" value="php" />
+  
+  <property name="CI.phpackager" value="phpackager" />
   <property name="CI.phpackager.target" value="${HOME_DIR}/target" />
   
-  <target name="CI-package" description="Create phpackage">
-    <fail unless="CI.phpackager.phar">Property 'CI.phpackager.phar' must be set"</fail>
+  <macrodef name="phpackager-tool">
+    <attribute name="phar" />
+    <attribute name="dir" default="${HOME_DIR}" />
+    <attribute name="target" default="${CI.phpackager.target}" />
+    <element name="args" optional="true" />
     
-    <delete dir="${CI.phpackager.target}" />
-    <mkdir dir="${CI.phpackager.target}" />
-
-    <exec executable="${system.php}" dir="${HOME_DIR}" failonerror="true">
-      <arg value="-d" />
-      <arg value="phar.readonly=0" />
-      <arg value="${CI.phpackager.phar}"/>
-      <arg value="--phar=${CI.phpackager.target}/${ant.project.name}.phar" />
-    </exec>
-  </target>
+    <sequential>
+      <mkdir dir="@{target}" />
+      <exec executable="cmd" dir="@{dir}" failonerror="@{failonerror}" osfamily="windows">
+        <arg value="/c" />
+        <arg value="${CI.phpackager}.bat" />
+        <arg value="--phar=@{target}/@{phar}" />
+        <args />
+      </exec>
+      
+      <exec executable="${CI.phpackager}" dir="@{dir}" failonerror="@{failonerror}" osfamily="unix">
+        <arg value="--phar=@{target}/@{phar}" />
+        <args />
+      </exec>
+    </sequential>
+  </macrodef>
   
+  <target name="CI-package" description="Create PHPackage">
+    <phpackager-tool phar="${ant.project.name}.phar" />
+  </target>
 </project>

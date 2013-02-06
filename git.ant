@@ -30,6 +30,13 @@
         <arg value="${git.branch}" />
       </args>
     </git>
+    <git command="submodule" dir="${git.dir}">
+      <args>
+        <arg value="update" />
+        <arg value="--init" />
+        <arg value="--recursive" />
+      </args>
+    </git>
   </target>
   
   <target name="git-clone" depends="git-available" unless="git.available">
@@ -40,6 +47,7 @@
         <arg value="${git.repository}" />
         <arg value="--origin=${git.remote}" />
         <arg value="--branch=${git.branch}" />
+        <arg value="--recursive" />
         <arg value="." />
       </args>
     </git>

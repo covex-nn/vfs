@@ -13,7 +13,7 @@
  </rule>
 
  <rule ref="Zend.NamingConventions.ValidVariableName" />
- 
+
  <rule ref="PEAR.WhiteSpace.ScopeClosingBrace">
   <properties>
    <property name="indent" value="2"/>

@@ -3,13 +3,14 @@ language: php
 php:
    - 5.3
 
+env:
+   global:
+      - secure: "ElEWAkuDpWN3wtIgZFXYLah+mybnsmyvhoTyKCpFLZGLZ0ZrT3IR1VVQ8V0v\niNoAVzjTfSfMKnOPnoGROrh9gFKS0N6WRTkoLzs6WOQ3ZDhAM+bXuxfX4Vvt\nPhY0qCOQO72MQzoSdDy3UftjGCnwSsB8/b/gqAR461KqHfUOARM="
+
 before_script:
    - wget http://getcomposer.org/composer.phar
+   - php composer.phar config github-oauth.github.com $GITHUB_OAUTH_TOKEN
    - ant -Dsystem.composer=composer.phar init
 
 script:
    - phpunit --coverage-text 
-
-notifications:
-   email:
-      - covex.mobile@gmail.com

@@ -1,6 +1,7 @@
-composer.lock
+.idea
 bin
 build
 build.local.properties
 nbproject
+phpunit.xml
 vendor

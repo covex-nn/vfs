@@ -1,8 +1,10 @@
 <?php
 
 /**
- * @package JooS
- * @subpackage Stream
+ * Stream entity (real file/directory)
+ *
+ * @author  Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * @license http://opensource.org/licenses/MIT  MIT License
  */
 namespace JooS\Stream;
 
@@ -11,11 +13,12 @@ namespace JooS\Stream;
  */
 class Entity extends Entity_Abstract
 {
+
   /**
    * Create new entity instance
-   * 
+   *
    * @param string $path Path to file
-   * 
+   *
    * @return Entity
    */
   public static function newInstance($path)
@@ -23,12 +26,12 @@ class Entity extends Entity_Abstract
     $basename = basename($path);
     return new self($basename, $path);
   }
-  
+
   /**
    * Fix slashes and backslashes in path
-   * 
+   *
    * @param string $path Path
-   * 
+   *
    * @return string
    */
   public static function fixPath($path)
@@ -49,4 +52,5 @@ class Entity extends Entity_Abstract
     }
     return $path;
   }
+
 }

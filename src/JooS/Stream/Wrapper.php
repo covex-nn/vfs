@@ -1,28 +1,30 @@
 <?php
 
 /**
- * @package JooS
- * @subpackage Stream
+ * Stream wrapper abstract class
+ *
+ * @author  Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * @license http://opensource.org/licenses/MIT  MIT License
  */
 namespace JooS\Stream;
 
 /**
- * Stream wrapper abstract class.
+ * Stream wrapper abstract class
  */
 abstract class Wrapper
 {
-  
+
   /**
    * @var string
    */
   protected static $_protocol;
-  
+
   /**
    * Register stream wrapper
-   * 
+   *
    * @param string $protocol Protocol name
    * @param int    $flags    STREAM_IS_URL if protocol is a URL protocol, or 0
-   * 
+   *
    * @throws Wrapper_Exception
    * @return boolean
    */
@@ -35,15 +37,15 @@ abstract class Wrapper
       );
     }
     $className = get_called_class();
-    
+
     return stream_wrapper_register($protocol, $className, $flags);
   }
-  
+
   /**
    * Unregister stream wrapper
-   * 
+   *
    * @param string $protocol Protocol name
-   * 
+   *
    * @throws Wrapper_Exception
    * @return boolean
    */
@@ -55,9 +57,9 @@ abstract class Wrapper
         "Protocol '$protocol' has not been registered yet"
       );
     }
-    
+
     return stream_wrapper_unregister($protocol);
   }
-  
+
 }
 

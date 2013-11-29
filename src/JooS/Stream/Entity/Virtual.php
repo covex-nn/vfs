@@ -1,8 +1,10 @@
 <?php
 
 /**
- * @package JooS
- * @subpackage Stream
+ * Virtual stream entity
+ *
+ * @author  Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * @license http://opensource.org/licenses/MIT  MIT License
  */
 namespace JooS\Stream;
 
@@ -11,19 +13,19 @@ namespace JooS\Stream;
  */
 class Entity_Virtual  extends Entity_Abstract implements Entity_Virtual_Interface
 {
-  
+
   /**
    * @var Entity_Interface
    */
   protected $_realEntity;
-  
+
   /**
    * Create new virtual stream entity
-   * 
+   *
    * @param Entity_Interface $entity Real stream entity
    * @param string           $path   Tmp path
    * @param string           $name   Optional basename
-   * 
+   *
    * @return Entity_Virtual
    */
   public static function newInstance(Entity_Interface $entity, $path, $name = null)
@@ -32,20 +34,20 @@ class Entity_Virtual  extends Entity_Abstract implements Entity_Virtual_Interfac
       $name = $entity->basename();
     }
     $instance = new static($name, $path);
-    /* @var $instance JooS_Stream_Entity_Virtual */
+    /* @var $instance Entity_Virtual */
     $instance->_realEntity = $entity;
-    
+
     return $instance;
   }
-  
+
   /**
    * Return saved old entity
-   * 
+   *
    * @return Entity_Interface
    */
   public function getRealEntity()
   {
     return $this->_realEntity;
   }
-  
+
 }

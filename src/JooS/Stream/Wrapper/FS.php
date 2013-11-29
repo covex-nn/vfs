@@ -1,8 +1,10 @@
 <?php
 
 /**
- * @package JooS
- * @subpackage Stream
+ * Stream for local file system
+ *
+ * @author  Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * @license http://opensource.org/licenses/MIT  MIT License
  */
 namespace JooS\Stream;
 
@@ -17,14 +19,14 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
    *
    * @param string $url   Url
    * @param int    $flags Flags
-   * 
+   *
    * @return array
    */
   public function url_stat($url, $flags)
   {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
-    
+
     return $partition->getStat($path, $flags);
   }
 
@@ -34,88 +36,88 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
    * @param string $url     Path
    * @param int    $mode    Mode
    * @param int    $options Options
-   * 
+   *
    * @return boolean
    */
   public function mkdir($url, $mode, $options)
   {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
-    
+
     return !!$partition->makeDirectory($path, $mode, $options);
   }
-  
+
   /**
    * Removes a directory
    *
    * @param string $url     Path
    * @param int    $options Options
-   * 
+   *
    * @return boolean
    */
   public function rmdir($url, $options)
   {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
-    
+
     return !!$partition->removeDirectory($path, $options);
   }
-  
+
   /**
    * Delete a file
-   * 
+   *
    * @param string $url Path
-   * 
+   *
    * @return bool
    */
   public function unlink($url)
   {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
-    
+
     return !!$partition->deleteFile($path);
   }
-  
+
   /**
    * Renames a file or directory
    *
    * @param string $srcPath Source path
    * @param string $dstPath Destination path
-   * 
+   *
    * @return boolean
    */
   public function rename($srcPath, $dstPath)
   {
     $srcPartition = self::getPartition($srcPath);
     $dstPartition = self::getPartition($dstPath);
-    
+
     if ($srcPartition != $dstPartition) {
       return false;
     }
-    
+
     $srcRelativePath = self::getRelativePath($srcPath);
     $dstRelativePath = self::getRelativePath($dstPath);
-    
+
     return !!$srcPartition->rename($srcRelativePath, $dstRelativePath);
   }
-  
+
   /**
    * @var array
    */
   private $_dirFiles;
-  
+
   /**
    * Open directory handle
-   * 
+   *
    * @param string $url Path
-   * 
+   *
    * @return boolean
    */
   public function dir_opendir($url)
   {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
-    
+
     $files = $partition->getList($path);
     if (is_array($files)) {
       $this->_dirFiles = array();
@@ -123,15 +125,15 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
         /* @var $file Entity_Interface */
         $this->_dirFiles[] = $file->basename();
       }
-      
+
       $result = true;
     } else {
       $result = false;
     }
-    
+
     return $result;
   }
-  
+
   /**
    * Read entry from directory handle
    *
@@ -140,16 +142,16 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
   public function dir_readdir()
   {
     $each = each($this->_dirFiles);
-    
+
     if ($each === false) {
       $result = false;
     } else {
       $result = $each["value"];
     }
-    
+
     return $result;
   }
-  
+
   /**
    * Close directory handle
    *
@@ -158,10 +160,10 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
   public function dir_closedir()
   {
     unset($this->_dirFiles);
-    
+
     return true;
   }
-  
+
   /**
    * Rewind directory handle
    *
@@ -170,7 +172,7 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
   public function dir_rewinddir()
   {
     reset($this->_dirFiles);
-    
+
     return true;
   }
 
@@ -178,12 +180,12 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
    * @var resource
    */
   private $_filePointer;
-  
+
   /**
    * @var Entity_Interface
    */
   private $_fileEntity;
-  
+
   /**
    * Constructs a new stream wrapper
    */
@@ -192,7 +194,7 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
     $this->_filePointer = null;
     $this->_fileEntity = null;
   }
-  
+
   /**
    * Opens file or URL
    *
@@ -200,25 +202,25 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
    * @param string $mode        Mode
    * @param int    $options     Options
    * @param string &$openedPath Opened Path
-   * 
+   *
    * @return boolean
    */
   public function stream_open($url, $mode, $options, &$openedPath)
   {
     $partition = self::getPartition($url);
     $path = self::getRelativePath($url);
-    
+
     $this->_filePointer = $partition->fileOpen(
       $path, $mode, $options, $this->_fileEntity
     );
-    
+
     $result = !!$this->_filePointer;
     if ($result && ($options & STREAM_USE_PATH)) {
       $openedPath = $path;
     }
     return $result;
   }
-  
+
   /**
    * Close an resource
    *
@@ -237,26 +239,26 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
 
   /**
    * Read from stream
-   * 
+   *
    * @param int $count Count
-   * 
+   *
    * @return string
    */
   public function stream_read($count)
   {
     return fread($this->_filePointer, $count);
   }
-  
+
   /**
    * Retrieve information about a file resource
-   * 
+   *
    * @return array
    */
   public function stream_stat()
   {
     return fstat($this->_filePointer);
   }
-  
+
   /**
    * Tests for end-of-file on a file pointer
    *
@@ -266,7 +268,7 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
   {
     return feof($this->_filePointer);
   }
-  
+
   /**
    * Retrieve the current position of a stream
    *
@@ -276,53 +278,53 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
   {
     return ftell($this->_filePointer);
   }
-  
+
   /**
    * Seeks to specific location in a stream
-   * 
+   *
    * @param int $offset Offset
    * @param int $whence = SEEK_SET
-   * 
+   *
    * @return boolean
    */
   public function stream_seek($offset, $whence = SEEK_SET)
   {
     return fseek($this->_filePointer, $offset, $whence);
   }
-  
+
   /**
    * Write to stream
-   * 
+   *
    * @param string $data Data
-   * 
+   *
    * @return int
    */
   public function stream_write($data)
   {
     return fwrite($this->_filePointer, $data);
   }
-  
+
   /**
    * Flushes the output
-   * 
+   *
    * @return boolean
    */
   public function stream_flush()
   {
     return fflush($this->_filePointer);
   }
-  
+
   /**
    * @var array
    */
   protected static $_partitions = array();
-  
+
   /**
    * Register stream wrapper
-   * 
+   *
    * @param string $protocol Protocol name
    * @param string $root     FS root directory
-   * 
+   *
    * @return boolean
    */
   public static function register($protocol, $root = null)
@@ -336,17 +338,17 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
       }
 
       $partition = new Wrapper_FS_Partition($content);
-      
+
       self::$_partitions[$protocol] = $partition;
     }
     return $result;
   }
-  
+
   /**
    * Commit all changes to real FS
-   * 
+   *
    * @param string $protocol Protocol name
-   * 
+   *
    * @return boolean
    */
   public static function commit($protocol)
@@ -355,49 +357,49 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
       $partition = self::$_partitions[$protocol];
       /* @var $partition Wrapper_FS_Partition */
       $partition->commit();
-      
+
       $result = true;
     } else {
       $result = false;
     }
-    
+
     return $result;
   }
-  
+
   /**
    * Unregister stream wrapper
-   * 
+   *
    * @param string $protocol Protocol name
-   * 
+   *
    * @return boolean
    */
   public static function unregister($protocol)
   {
     unset(self::$_partitions[$protocol]);
-    
+
     return parent::unregister($protocol);
   }
-  
+
   /**
    * Return partition by file url
-   * 
+   *
    * @param string $url Url
-   * 
+   *
    * @return Wrapper_FS_Partition
    */
   protected static function getPartition($url)
   {
     $urlParts = explode("://", $url);
     $protocol = array_shift($urlParts);
-    
+
     return self::$_partitions[$protocol];
   }
-  
+
   /**
    * Return urlPath of url
-   * 
+   *
    * @param string $url Url
-   * 
+   *
    * @return string
    */
   public static function getRelativePath($url)
@@ -408,5 +410,5 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
 
     return Entity::fixPath($urlPath);
   }
-  
+
 }

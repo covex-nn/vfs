@@ -322,14 +322,15 @@ class Wrapper_FS extends Wrapper implements Wrapper_FS_Interface
   /**
    * Register stream wrapper
    *
-   * @param string $protocol Protocol name
-   * @param string $root     FS root directory
+   * @param string  $protocol Protocol name
+   * @param string  $root     FS root directory
+   * @param integer $flags    Stream flags
    *
    * @return boolean
    */
-  public static function register($protocol, $root = null)
+  public static function register($protocol, $root = null, $flags = 0)
   {
-    $result = parent::register($protocol, STREAM_IS_URL);
+    $result = parent::register($protocol, $flags);
     if ($result) {
       if (!is_null($root)) {
         $content = Entity::newInstance($root);

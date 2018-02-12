@@ -116,12 +116,13 @@ class FileSystem implements FileSystemInterface
 
     public function dir_readdir()
     {
-        $each = each($this->dirFiles);
+        $value = current($this->dirFiles);
 
-        if (false === $each) {
+        if (false === $value) {
             $result = false;
         } else {
-            $result = $each['value'];
+            $result = $value;
+            next($this->dirFiles);
         }
 
         return $result;

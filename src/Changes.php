@@ -15,7 +15,7 @@ use Covex\Stream\File\EntityInterface;
 /**
  * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
  */
-class Changes
+class Changes implements \Countable
 {
     /**
      * @var array

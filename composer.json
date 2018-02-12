@@ -1,34 +1,38 @@
 {
     "name" : "covex-nn/joos-stream",
     "type" : "library",
+    "description" : "PHP stream wrapper, transactional virtual file system",
+    "keywords" : [
+        "wrapper",
+        "testing",
+        "mock file system"
+    ],
     "license" : "MIT",
     "authors": [
         {
             "name" : "Andrey F. Mindubaev",
-            "email" : "covex.mobile@gmail.com",
-            "role" : "Developer"
+            "email" : "covex.mobile@gmail.com"
         }
     ],
-    "description" : "PHP stream wrapper, transactional virtual file system",
-    "keywords" : [ "streaming", "wrapper", "phpunit", "testing", "mock file system" ],
     "require": {
-        "php" : ">=5.3.3"
+        "php" : "^7.0"
     },
-    "require-dev" : {
-        "covex-nn/phpqatools" : "~1.3",
-        "apnet/coding-standard" : "~1.0"
-    },
-    "autoload" : {
-        "psr-0" : {
-            "JooS\\" : "src/"
-        }
+    "config": {
+        "sort-packages": true
     },
     "extra" : {
         "branch-alias": {
-            "dev-master": "4.0.x-dev"
+            "dev-master": "5.x-dev"
         }
     },
-    "config": {
-        "bin-dir" : "bin"
+    "autoload" : {
+        "psr-4" : {
+            "Covex\\Stream\\" : "src/"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4" : {
+            "Covex\\Stream\\Tests\\" : "tests/"
+        }
     }
 }

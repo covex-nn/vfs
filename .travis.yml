@@ -1,16 +1,23 @@
 language: php
 
-php:
-   - 5.3
+sudo: false
 
-env:
-   global:
-      - secure: "ElEWAkuDpWN3wtIgZFXYLah+mybnsmyvhoTyKCpFLZGLZ0ZrT3IR1VVQ8V0v\niNoAVzjTfSfMKnOPnoGROrh9gFKS0N6WRTkoLzs6WOQ3ZDhAM+bXuxfX4Vvt\nPhY0qCOQO72MQzoSdDy3UftjGCnwSsB8/b/gqAR461KqHfUOARM="
+php:
+   - 7.0
+   - 7.1
+   - 7.2
+
+before_install:
+    - mkdir --parents "${HOME}/bin"
+
+install:
+    - composer install
 
 before_script:
-   - wget http://getcomposer.org/composer.phar
-   - sh -c "if $TRAVIS_SECURE_ENV_VARS; then php composer.phar config github-oauth.github.com $GITHUB_OAUTH_TOKEN; fi"
-   - ant -Dsystem.composer=composer.phar init
+    - wget "http://cs.sensiolabs.org/download/php-cs-fixer-v2.phar" --output-document="${HOME}/bin/php-cs-fixer"
+    - chmod u+x "${HOME}/bin/php-cs-fixer"
+    - php-cs-fixer fix --diff --dry-run -v
 
 script:
-   - phpunit --coverage-text 
+    - composer validate --strict --no-check-lock
+    - phpunit --coverage-text

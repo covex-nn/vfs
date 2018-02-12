@@ -1,5 +1,5 @@
 {
-    "name" : "covex-nn/joos-stream",
+    "name" : "covex-nn/vfs",
     "type" : "library",
     "description" : "PHP stream wrapper, transactional virtual file system",
     "keywords" : [
@@ -22,7 +22,7 @@
     },
     "extra" : {
         "branch-alias": {
-            "dev-master": "5.x-dev"
+            "dev-master": "1.x-dev"
         }
     },
     "autoload" : {

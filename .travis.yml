@@ -9,7 +9,6 @@ sudo: false
 env:
     global:
         - COMPOSER_INSTALL=true
-        - PHPCSFIXER_FLAGS="--diff --dry-run -v"
         - PHPUNIT_FLAGS="-v"
         - PHPUNIT_VERSION="7.0"
         - TRAVIS_SCRIPT="phpunit"
@@ -62,7 +61,7 @@ before_script:
 
 script:
     - if [[ $TRAVIS_SCRIPT == 'lint' ]]; then
-          php-cs-fixer fix $PHPCSFIXER_FLAGS;
+          php-cs-fixer fix --diff --dry-run -v;
       fi
     - if [[ $TRAVIS_SCRIPT == 'phpunit' ]]; then
           phpunit $PHPUNIT_FLAGS;

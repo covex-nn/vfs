@@ -51,14 +51,6 @@ install:
           composer install;
       fi
 
-before_script:
-    - if [[ $TRAVIS_SCRIPT == 'lint' ]]; then
-          php-cs-fixer --version;
-      fi
-    - if [[ $TRAVIS_SCRIPT == 'phpunit' ]]; then
-          phpunit --version;
-      fi
-
 script:
     - if [[ $TRAVIS_SCRIPT == 'lint' ]]; then
           php-cs-fixer fix --diff --dry-run -v;

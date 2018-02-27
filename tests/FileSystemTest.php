@@ -17,6 +17,37 @@ use RecursiveIteratorIterator;
 
 class FileSystemTest extends \PHPUnit\Framework\TestCase
 {
+    private $protocols = [];
+
+    protected function setUp(): void
+    {
+        $this->protocols = [];
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->protocols as $protocol) {
+            FileSystem::unregister($protocol);
+        }
+    }
+
+    public function testRegisterTwice(): void
+    {
+        $this->expectException(\Covex\Stream\Exception::class);
+        $this->expectExceptionMessage('Protocol \'vfs-test\' has been already registered');
+
+        $this->registerFS('vfs-test');
+        $this->registerFS('vfs-test');
+    }
+
+    public function testUnregisterNonExist(): void
+    {
+        $this->expectException(\Covex\Stream\Exception::class);
+        $this->expectExceptionMessage('Protocol \'vfs-test\' has not been registered yet');
+
+        $this->unregisterFS('vfs-test');
+    }
+
     /**
      * @dataProvider providerGetRelativePath
      */
@@ -37,20 +68,21 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
 
     public function testRegister1(): void
     {
-        $this->streamStart(__DIR__);
+        $this->registerFS('vfs-test', __DIR__);
         $this->assertTrue(in_array('vfs-test', stream_get_wrappers()));
 
         $this->assertEquals(
             file_get_contents(__FILE__), file_get_contents('vfs-test://'.basename(__FILE__))
         );
 
-        $this->streamStop();
+        $this->unregisterFS('vfs-test');
         $this->assertFalse(in_array('vfs-test', stream_get_wrappers()));
     }
 
     public function testFiles(): void
     {
-        $this->filesStart();
+        $this->registerFS('vfs-test');
+        $this->initFiles('vfs-test');
 
         $this->assertTrue(is_file('vfs-test://file1.txt'));
         $this->assertEquals('file1', file_get_contents('vfs-test://file1.txt'));
@@ -73,12 +105,13 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $od1 = @opendir('vfs-test://file1.txt');
         $this->assertFalse($od1);
 
-        $this->filesStop();
+        $this->unregisterFS('vfs-test');
     }
 
     public function testUnlinkRmdir(): void
     {
-        $this->filesStart();
+        $this->registerFS('vfs-test');
+        $this->initFiles('vfs-test');
 
         $stat1 = stat('vfs-test://dir1/dir5');
         $this->assertInternalType('array', $stat1);
@@ -110,12 +143,13 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $this->assertFileNotExists('vfs-test://dir1/dir5/file5.txt');
         $this->assertFileNotExists('vfs-test://dir1/dir5');
 
-        $this->filesStop();
+        $this->unregisterFS('vfs-test');
     }
 
     public function testRename(): void
     {
-        $this->filesStart();
+        $this->registerFS('vfs-test');
+        $this->initFiles('vfs-test');
 
         $rename1 = @rename('vfs-test://file1.txt', 'vfs-test://dir1');
         $this->assertFalse($rename1);
@@ -139,12 +173,32 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         rename('vfs-test://dir1', 'vfs-test://dir2/dir5/dir7');
         $this->assertEquals('file7', file_get_contents('vfs-test://dir2/dir5/dir7/file7.txt'));
 
-        $this->filesStop();
+        $this->unregisterFS('vfs-test');
+    }
+
+    public function testSeek(): void
+    {
+        $this->registerFS('vfs-test');
+        file_put_contents('vfs-test://file.txt', 'text');
+
+        $fp = fopen('vfs-test://file.txt', 'r');
+        $this->assertEquals(0, ftell($fp));
+
+        fseek($fp, 1);
+        $this->assertEquals(1, ftell($fp));
+
+        $letters = fread($fp, 2);
+        $this->assertEquals('ex', $letters);
+        $this->assertEquals(3, ftell($fp));
+
+        fclose($fp);
+
+        $this->unregisterFS('vfs-test');
     }
 
     public function testRealFS(): void
     {
-        $this->streamStart(__DIR__.'/FS_realdir');
+        $this->registerFS('vfs-test', __DIR__.'/FS_realdir');
 
         $this->assertFileExists('vfs-test://dir1/dir2/dir3/file3.txt');
         $this->assertFileNotExists('vfs-test://dir1/dir2/dir3/dir4/file4.txt');
@@ -176,17 +230,17 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $fp1 = @fopen('vfs-test://dir1/file1.txt', 'x+');
         $this->assertFalse($fp1);
 
-        $this->streamStop();
+        $this->unregisterFS('vfs-test');
     }
 
     public function testCommit1(): void
     {
-        $this->streamStart();
+        $this->registerFS('vfs-test');
 
         $commit = FileSystem::commit('vfs-test');
         $this->assertTrue($commit);
 
-        $this->streamStop();
+        $this->unregisterFS('vfs-test');
     }
 
     public function testCommit2(): void
@@ -194,7 +248,8 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $commit1 = FileSystem::commit('vfs-test-not-a-protocol');
         $this->assertFalse($commit1);
 
-        $this->streamStart(null, 'vfs1-test');
+        $this->registerFS('vfs1-test');
+
         mkdir('vfs1-test://root');
         file_put_contents('vfs1-test://root/file0.txt', 'file0');
         mkdir('vfs1-test://root/dir1');
@@ -211,7 +266,7 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
          * dir3
          * file0.txt (file0)
          */
-        $this->streamStart('vfs1-test://root', 'vfs2-test');
+        $this->registerFS('vfs2-test', 'vfs1-test://root');
 
         file_put_contents('vfs2-test://file0-0.txt', 'file0-0');
         unlink('vfs2-test://file0-0.txt');
@@ -226,7 +281,7 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $commit2 = FileSystem::commit('vfs2-test');
         $this->assertTrue($commit2);
 
-        $this->streamStop('vfs2-test');
+        $this->unregisterFS('vfs2-test');
 
         // dir1
         $this->assertFileExists('vfs1-test://root/dir1');
@@ -253,10 +308,10 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(is_file('vfs1-test://root/dir4/file4.txt'));
         $this->assertEquals('file4', file_get_contents('vfs1-test://root/dir4/file4.txt'));
 
-        $this->streamStop('vfs1-test');
+        $this->unregisterFS('vfs1-test');
     }
 
-    private function getAllPaths($dir): array
+    protected function getAllPaths($dir): array
     {
         $iteratorRd = new RecursiveDirectoryIterator($dir);
         $iteratorRi = new RecursiveIteratorIterator(
@@ -274,32 +329,24 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         return $paths;
     }
 
-    private function filesStart($dir = null): void
+    protected function initFiles($protocol): void
     {
-        $this->streamStart($dir);
-
-        file_put_contents('vfs-test://file1.txt', 'file1');
-        mkdir('vfs-test://dir1');
-        file_put_contents('vfs-test://dir1/file2.txt', 'file2');
-        mkdir('vfs-test://dir1/dir5');
-        file_put_contents('vfs-test://dir1/dir5/file5.txt', 'file5');
+        file_put_contents($protocol.'://file1.txt', 'file1');
+        mkdir($protocol.'://dir1');
+        file_put_contents($protocol.'://dir1/file2.txt', 'file2');
+        mkdir($protocol.'://dir1/dir5');
+        file_put_contents($protocol.'://dir1/dir5/file5.txt', 'file5');
     }
 
-    private function filesStop(): void
+    protected function registerFS($protocol, $dir = null): void
     {
-        $this->streamStop();
-    }
-
-    private function streamStart($dir = null, $protocol = 'vfs-test'): void
-    {
-        if (in_array($protocol, stream_get_wrappers())) {
-            $this->streamStop();
-        }
         FileSystem::register($protocol, $dir);
+        $this->protocols[$protocol] = $protocol;
     }
 
-    private function streamStop($protocol = 'vfs-test'): void
+    protected function unregisterFS($protocol): void
     {
+        unset($this->protocols[$protocol]);
         FileSystem::unregister($protocol);
     }
 }

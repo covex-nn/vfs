@@ -18,6 +18,7 @@ use Covex\Stream\File\EntityAbstract;
 use Covex\Stream\File\EntityInterface;
 use Covex\Stream\File\Virtual;
 use Covex\Stream\File\VirtualInterface;
+use Symfony\Component\Filesystem\Filesystem as RealFilesystem;
 
 /**
  * Filesystem tree.
@@ -39,20 +40,35 @@ class Partition
     private $changes = null;
 
     /**
-     * @var Files
+     * @var RealFilesystem
      */
-    private $files;
+    private $fs;
+
+    /**
+     * @var string
+     */
+    private $fsRoot = null;
+
+    /**
+     * @var int
+     */
+    private $fsCounter = 0;
 
     public function __construct(EntityInterface $content = null)
     {
-        $this->files = new Files();
+        $this->fs = new RealFilesystem();
 
         if (null === $content) {
-            $folder = $this->files->mkdir(0777);
-
-            $content = Entity::newInstance($folder);
+            $content = Entity::newInstance($this->getFsRoot());
         }
         $this->setRoot($content);
+    }
+
+    public function __destruct()
+    {
+        if (null !== $this->fsRoot) {
+            $this->fs->remove($this->fsRoot);
+        }
     }
 
     /**
@@ -217,9 +233,10 @@ class Partition
         $entity = $this->getEntity($path);
         if (null !== $entity) {
             if (!$entity->file_exists()) {
-                $tmpPath = $this->files->mkdir($mode);
+                $dir = $this->tempnam();
+                $this->fs->mkdir($dir, $mode);
 
-                $result = Virtual::newInstance($entity, $tmpPath);
+                $result = Virtual::newInstance($entity, $dir);
 
                 $changes = $this->getChanges();
                 $changes->add($path, $result);
@@ -315,7 +332,7 @@ class Partition
                     }
                 }
             } else {
-                $tmpPath = $this->files->tempnam();
+                $tmpPath = $this->tempnam();
                 copy($srcEntity->path(), $tmpPath);
 
                 $dstEntity = Virtual::newInstance(
@@ -331,6 +348,20 @@ class Partition
         }
 
         return $result;
+    }
+
+    /**
+     * Get unique filename.
+     */
+    public function tempnam(): string
+    {
+        $root = $this->getFsRoot();
+        do {
+            ++$this->fsCounter;
+            $name = $root.'/'.$this->fsCounter;
+        } while (file_exists($name));
+
+        return $name;
     }
 
     /**
@@ -356,7 +387,7 @@ class Partition
                 if ('r' != $mode) {
                     $isVirtual = ($entity instanceof VirtualInterface);
                     if (!$exists || !$isVirtual) {
-                        $tmpPath = $this->files->tempnam();
+                        $tmpPath = $this->tempnam();
                         $basename = basename($path);
 
                         if ($exists) {
@@ -410,7 +441,7 @@ class Partition
     protected function setRoot(EntityInterface $entity): void
     {
         if (!$entity->file_exists() || !$entity->is_dir()) {
-            throw new Exception('Root folder is not valid');
+            throw new Exception('Root directory is not valid');
         }
 
         $this->root = $entity;
@@ -477,7 +508,7 @@ class Partition
                 continue;
             } elseif ($rDeleted) {
                 if ($rExists) {
-                    $this->files->delete($rPath);
+                    $this->fs->remove($rPath);
                 }
                 if ($vExists) {
                     $this->copyChanges($filepath);
@@ -522,5 +553,24 @@ class Partition
                 $this->copyChanges($path.'/'.$file->basename());
             }
         }
+    }
+
+    /**
+     * Create own temp directory and return path.
+     */
+    private function getFsRoot(): ?string
+    {
+        if (null === $this->fsRoot) {
+            $tempDir = rtrim(sys_get_temp_dir(), '\\/');
+
+            do {
+                $name = $tempDir.'/'.uniqid('vfs', true);
+            } while (file_exists($name));
+
+            $this->fs->mkdir($name);
+            $this->fsRoot = $name;
+        }
+
+        return $this->fsRoot;
     }
 }

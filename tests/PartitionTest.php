@@ -17,20 +17,24 @@ use PHPUnit\Framework\TestCase;
 
 class PartitionTest extends TestCase
 {
+    /**
+     * @expectedException \Covex\Stream\Exception
+     * @expectedExceptionMessage Root directory is not valid
+     */
     public function testWrongRoot1(): void
     {
-        $this->expectException(\Covex\Stream\Exception::class);
-
         $entity = Entity::newInstance(__FILE__);
-        $fs = new Partition($entity);
+        new Partition($entity);
     }
 
+    /**
+     * @expectedException \Covex\Stream\Exception
+     * @expectedExceptionMessage Root directory is not valid
+     */
     public function testWrongRoot2(): void
     {
-        $this->expectException(\Covex\Stream\Exception::class);
-
         $entity = Entity::newInstance(__FILE__.'.ksdckjsbcajhsc');
-        $fs = new Partition($entity);
+        new Partition($entity);
     }
 
     public function testInstance(): void

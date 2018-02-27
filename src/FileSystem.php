@@ -79,17 +79,12 @@ class FileSystem implements FileSystemInterface
 
     public function rename(string $srcPath, string $dstPath): bool
     {
-        $srcPartition = self::getPartition($srcPath);
-        $dstPartition = self::getPartition($dstPath);
-
-        if ($srcPartition !== $dstPartition) {
-            return false;
-        }
+        $partition = self::getPartition($srcPath);
 
         $srcRelativePath = self::getRelativePath($srcPath);
         $dstRelativePath = self::getRelativePath($dstPath);
 
-        return (bool) $srcPartition->rename($srcRelativePath, $dstRelativePath);
+        return (bool) $partition->rename($srcRelativePath, $dstRelativePath);
     }
 
     public function dir_opendir(string $url): bool
@@ -272,11 +267,11 @@ class FileSystem implements FileSystemInterface
     /**
      * Get partition by file url.
      */
-    protected static function getPartition(string $url): Partition
+    protected static function getPartition(string $url): ?Partition
     {
         $urlParts = explode('://', $url);
         $protocol = array_shift($urlParts);
 
-        return self::$partitions[$protocol];
+        return self::$partitions[$protocol] ?? null;
     }
 }

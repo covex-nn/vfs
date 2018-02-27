@@ -11,28 +11,27 @@ declare(strict_types=1);
 
 namespace Covex\Stream\Tests;
 
+use Covex\Stream\Exception;
 use Covex\Stream\File\Entity;
 use Covex\Stream\Partition;
 use PHPUnit\Framework\TestCase;
 
 class PartitionTest extends TestCase
 {
-    /**
-     * @expectedException \Covex\Stream\Exception
-     * @expectedExceptionMessage Root directory is not valid
-     */
     public function testWrongRoot1(): void
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Root directory is not valid');
+
         $entity = Entity::newInstance(__FILE__);
         new Partition($entity);
     }
 
-    /**
-     * @expectedException \Covex\Stream\Exception
-     * @expectedExceptionMessage Root directory is not valid
-     */
     public function testWrongRoot2(): void
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Root directory is not valid');
+
         $entity = Entity::newInstance(__FILE__.'.ksdckjsbcajhsc');
         new Partition($entity);
     }

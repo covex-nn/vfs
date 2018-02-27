@@ -1,12 +1,13 @@
 <?php
 
-/**
- * Stream for local file system.
+declare(strict_types=1);
+
+/*
+ * (c) Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Covex\Stream;
 
@@ -14,12 +15,12 @@ use Covex\Stream\File\Entity;
 use Covex\Stream\File\EntityInterface;
 
 /**
- * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * Stream for local file system.
  */
 class FileSystem implements FileSystemInterface
 {
     /**
-     * @var array
+     * @var Partition[]
      */
     protected static $partitions = [];
 
@@ -38,9 +39,6 @@ class FileSystem implements FileSystemInterface
      */
     private $fileEntity;
 
-    /**
-     * Constructs a new stream wrapper.
-     */
     public function __construct()
     {
         $this->filePointer = null;
@@ -103,7 +101,6 @@ class FileSystem implements FileSystemInterface
         if (is_array($files)) {
             $this->dirFiles = [];
             foreach ($files as $file) {
-                /* @var $file EntityInterface */
                 $this->dirFiles[] = $file->basename();
             }
             $result = true;
@@ -201,13 +198,6 @@ class FileSystem implements FileSystemInterface
 
     /**
      * Register stream wrapper.
-     *
-     * @param string $protocol Protocol name
-     * @param string $root     FS root directory
-     * @param int    $flags    Stream flags
-     *
-     * @throws Exception
-     * @return bool
      */
     public static function register(string $protocol, string $root = null, int $flags = 0): bool
     {
@@ -236,17 +226,11 @@ class FileSystem implements FileSystemInterface
 
     /**
      * Commit all changes to real FS.
-     *
-     * @param string $protocol Protocol name
-     *
-     * @return bool
      */
     public static function commit(string $protocol): bool
     {
         if (isset(self::$partitions[$protocol])) {
-            $partition = self::$partitions[$protocol];
-            /* @var $partition Partition */
-            $partition->commit();
+            self::$partitions[$protocol]->commit();
 
             $result = true;
         } else {
@@ -256,6 +240,9 @@ class FileSystem implements FileSystemInterface
         return $result;
     }
 
+    /**
+     * Unregister stream wrapper.
+     */
     public static function unregister(string $protocol): bool
     {
         unset(self::$partitions[$protocol]);
@@ -271,11 +258,7 @@ class FileSystem implements FileSystemInterface
     }
 
     /**
-     * Return urlPath of url.
-     *
-     * @param string $url Url
-     *
-     * @return string
+     * Get relative path of an url.
      */
     public static function getRelativePath(string $url): string
     {
@@ -287,11 +270,7 @@ class FileSystem implements FileSystemInterface
     }
 
     /**
-     * Return partition by file url.
-     *
-     * @param string $url Url
-     *
-     * @return Partition
+     * Get partition by file url.
      */
     protected static function getPartition(string $url): Partition
     {

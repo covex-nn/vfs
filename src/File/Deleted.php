@@ -1,17 +1,18 @@
 <?php
 
-/**
- * Deleted stream entity.
+declare(strict_types=1);
+
+/*
+ * (c) Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Covex\Stream\File;
 
 /**
- * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * Deleted stream entity.
  */
 class Deleted extends EntityAbstract implements DeletedInterface
 {
@@ -25,7 +26,7 @@ class Deleted extends EntityAbstract implements DeletedInterface
      *
      * @param EntityInterface $realEntity Real stream entity
      *
-     * @return static
+     * @return $this
      */
     public static function newInstance(EntityInterface $realEntity): self
     {
@@ -39,18 +40,13 @@ class Deleted extends EntityAbstract implements DeletedInterface
     }
 
     /**
-     * Return saved old entity.
-     *
-     * @return EntityInterface
+     * Get saved old entity.
      */
     public function getRealEntity(): EntityInterface
     {
         return $this->realEntity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function file_exists(): bool
     {
         return false;

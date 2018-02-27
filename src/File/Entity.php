@@ -1,26 +1,23 @@
 <?php
 
-/**
- * Stream entity (real file/directory).
+declare(strict_types=1);
+
+/*
+ * (c) Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Covex\Stream\File;
 
 /**
- * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * Stream entity (real file/directory).
  */
 class Entity extends EntityAbstract
 {
     /**
-     * Create new entity instance.
-     *
-     * @param string $path Path to file
-     *
-     * @return static
+     * @return $this
      */
     public static function newInstance(string $path): self
     {
@@ -31,10 +28,6 @@ class Entity extends EntityAbstract
 
     /**
      * Fix slashes and backslashes in path.
-     *
-     * @param string $path Path
-     *
-     * @return string
      */
     public static function fixPath(string $path): string
     {

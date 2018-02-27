@@ -1,19 +1,20 @@
 <?php
 
-/**
- * Partition changes, tree data.
+declare(strict_types=1);
+
+/*
+ * (c) Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Covex\Stream;
 
 use Covex\Stream\File\EntityInterface;
 
 /**
- * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * Partition changes, tree data.
  */
 class Changes implements \Countable
 {
@@ -34,11 +35,7 @@ class Changes implements \Countable
     }
 
     /**
-     * Return stream entity.
-     *
-     * @param string $path Path
-     *
-     * @return EntityInterface|null
+     * Get stream entity.
      */
     public function get(string $path): ?EntityInterface
     {
@@ -54,12 +51,7 @@ class Changes implements \Countable
     }
 
     /**
-     * Add stream entity to changes array.
-     *
-     * @param string          $path   Path
-     * @param EntityInterface $entity Stream entity
-     *
-     * @return bool
+     * Add stream entity to array.
      */
     public function add(string $path, EntityInterface $entity): bool
     {
@@ -79,9 +71,7 @@ class Changes implements \Countable
     /**
      * Delete stream entity from array.
      *
-     * @param string|array $path Path
-     *
-     * @return bool
+     * @param string|array $path
      */
     public function delete($path): bool
     {
@@ -107,10 +97,6 @@ class Changes implements \Countable
 
     /**
      * Is $path added to array ?
-     *
-     * @param string $path Path
-     *
-     * @return bool
      */
     public function exists(string $path): bool
     {
@@ -120,22 +106,17 @@ class Changes implements \Countable
         return null !== $subtree && isset($subtree->ownData[$name]);
     }
 
-    /**
-     * Count elements.
-     *
-     * @return int
-     */
     public function count(): int
     {
         return count($this->ownData) + count($this->subTrees);
     }
 
     /**
-     * Return subtree's own changes.
+     * Get subtree's own changes.
      *
-     * @param array|string $path Path
+     * @param array|string $path
      *
-     * @return array
+     * @return EntityInterface[]
      */
     public function own($path = ''): array
     {
@@ -158,11 +139,9 @@ class Changes implements \Countable
     }
 
     /**
-     * Return all children in path/*.*.
+     * Get all children in path/*.*.
      *
      * @param array|string $path Path
-     *
-     * @return array
      */
     public function children($path = ''): array
     {
@@ -190,32 +169,28 @@ class Changes implements \Countable
     }
 
     /**
-     * Return subtree by path.
+     * Get subtree by path.
      *
-     * @param string|array $path   Path
-     * @param string       $name   Name of new element
-     * @param bool         $create Auto create subtree ?
-     *
-     * @return Changes|null
+     * @param string|array $path
      */
     public function subtree($path, string &$name = null, bool $create = false): ?self
     {
         $parts = $this->split($path);
 
-        $_name = array_shift($parts);
+        $dirOrFile = array_shift($parts);
         if (!count($parts)) {
-            $name = $_name;
+            $name = $dirOrFile;
             $subtree = $this;
         } else {
-            $exists = isset($this->subTrees[$_name]);
+            $exists = isset($this->subTrees[$dirOrFile]);
             if (!$exists && !$create) {
                 $subtree = null;
                 $name = null;
             } else {
                 if (!$exists && $create) {
-                    $this->subTrees[$_name] = new self();
+                    $this->subTrees[$dirOrFile] = new self();
                 }
-                $subtree = $this->subTrees[$_name]->subtree($parts, $name, $create);
+                $subtree = $this->subTrees[$dirOrFile]->subtree($parts, $name, $create);
             }
         }
 
@@ -223,9 +198,9 @@ class Changes implements \Countable
     }
 
     /**
-     * Return a list of own subtrees.
+     * Get a list of own subtrees.
      *
-     * @return array
+     * @return Changes[]
      */
     public function sublists(): array
     {
@@ -236,8 +211,6 @@ class Changes implements \Countable
      * Split path into dir names.
      *
      * @param string|array $path Path
-     *
-     * @return array
      */
     protected function split($path): array
     {
@@ -252,14 +225,10 @@ class Changes implements \Countable
 
     /**
      * Add new children to array.
-     *
-     * @param array  $children  Children array
-     * @param string $name      Current name
-     * @param array  $_children Children of subtrees
      */
-    private function appendChildren(array &$children, string $name, array $_children): void
+    private function appendChildren(array &$children, string $name, array $new): void
     {
-        foreach ($_children as $key => $value) {
+        foreach ($new as $key => $value) {
             $children[$name.'/'.$key] = $value;
         }
     }

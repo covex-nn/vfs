@@ -1,12 +1,13 @@
 <?php
 
-/**
- * Filesystem tree.
+declare(strict_types=1);
+
+/*
+ * (c) Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Covex\Stream;
 
@@ -20,8 +21,6 @@ use Covex\Stream\File\VirtualInterface;
 
 /**
  * Filesystem tree.
- *
- * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * @todo нужно проверять на is_writable:
  *        1) изменение/удаление реальных файлов
@@ -44,9 +43,6 @@ class Partition
      */
     private $files;
 
-    /**
-     * @param EntityInterface $content Folder
-     */
     public function __construct(EntityInterface $content = null)
     {
         $this->files = new Files();
@@ -60,9 +56,7 @@ class Partition
     }
 
     /**
-     * Return root of filesystem.
-     *
-     * @return EntityInterface
+     * Get root of filesystem.
      */
     public function getRoot(): EntityInterface
     {
@@ -70,11 +64,7 @@ class Partition
     }
 
     /**
-     * Return file/directory entity.
-     *
-     * @param string $filename Path to file/directory
-     *
-     * @return EntityInterface|null
+     * Get file/directory entity.
      */
     public function getEntity(string $filename): ?EntityInterface
     {
@@ -132,11 +122,9 @@ class Partition
     }
 
     /**
-     * Return list of files inside directory path.
+     * Get list of files inside directory path.
      *
-     * @param string $path Path
-     *
-     * @return array|null
+     * @return EntityInterface[]|null
      */
     public function getList(string $path)
     {
@@ -183,9 +171,6 @@ class Partition
 
             $result = array_values($mergedFiles);
         } else {
-            /**
-             * @todo !!! возвращать пустой массив!
-             */
             $result = null;
         }
 
@@ -194,9 +179,6 @@ class Partition
 
     /**
      * Retrieve information about a file.
-     *
-     * @param string $path  Path to file
-     * @param int    $flags Flags
      *
      * @return array|bool
      */
@@ -221,22 +203,14 @@ class Partition
         } else {
             $stat = stat($path);
         }
-        /*
-         * @todo всегда возвращать массив
-         */
+
         return $stat;
     }
 
     /**
      * Create a directory.
-     *
-     * @param string $path    Path
-     * @param int    $mode    Mode
-     * @param int    $options Options
-     *
-     * @return EntityInterface|null
      */
-    public function makeDirectory($path, $mode, $options)
+    public function makeDirectory($path, $mode, $options): ?EntityInterface
     {
         $result = null;
 
@@ -264,13 +238,8 @@ class Partition
 
     /**
      * Remove directory.
-     *
-     * @param string $path    Path to directory
-     * @param int    $options Stream options
-     *
-     * @return Deleted|null
      */
-    public function removeDirectory(string $path, int $options)
+    public function removeDirectory(string $path, int $options): ?Deleted
     {
         $list = $this->getList($path);
         if (null === $list) {
@@ -297,12 +266,8 @@ class Partition
 
     /**
      * Delete a file.
-     *
-     * @param string $path Path
-     *
-     * @return Deleted|null
      */
-    public function deleteFile(string $path)
+    public function deleteFile(string $path): ?Deleted
     {
         $entity = $this->getEntity($path);
 
@@ -322,13 +287,8 @@ class Partition
 
     /**
      * Renames a file or directory.
-     *
-     * @param string $srcPath Source path
-     * @param string $dstPath Destination path
-     *
-     * @return Virtual|null
      */
-    public function rename(string $srcPath, string $dstPath)
+    public function rename(string $srcPath, string $dstPath): ?Virtual
     {
         $changes = $this->getChanges();
 
@@ -347,7 +307,6 @@ class Partition
                 $list = $this->getList($srcPath);
                 if (count($list)) {
                     foreach ($list as $file) {
-                        /* @var $file EntityInterface */
                         $filename = $file->basename();
                         $this->rename(
                             $srcPath.'/'.$filename,
@@ -377,10 +336,6 @@ class Partition
     /**
      * Opens file or URL.
      *
-     * @param string $path    Path
-     * @param string $mode    Mode
-     * @param int    $options Options
-     *
      * @return resource
      *
      * @see http://php.net/manual/en/function.fopen.php
@@ -401,7 +356,6 @@ class Partition
                 if ('r' != $mode) {
                     $isVirtual = ($entity instanceof VirtualInterface);
                     if (!$exists || !$isVirtual) {
-                        /* @var $entity Entity */
                         $tmpPath = $this->files->tempnam();
                         $basename = basename($path);
 
@@ -452,10 +406,6 @@ class Partition
 
     /**
      * Init root.
-     *
-     * @param EntityInterface $entity Folder
-     *
-     * @throws Exception
      */
     protected function setRoot(EntityInterface $entity): void
     {
@@ -467,9 +417,7 @@ class Partition
     }
 
     /**
-     * Return FS-changes object.
-     *
-     * @return Changes
+     * Get FS-changes object.
      */
     protected function getChanges(): Changes
     {
@@ -495,9 +443,6 @@ class Partition
      *
      * По всем subtree
      * - сделать тоже самое, если не было собственных изменений
-     *
-     * @param Changes $changes Changes in FS
-     * @param string  $path    Path to commit
      */
     private function commitInternal(Changes $changes, string $path = ''): void
     {
@@ -513,7 +458,7 @@ class Partition
             $filepath = $path.$filename;
             $rPath = $rootpath.'/'.$filepath;
 
-            /* @var $vEntity EntityAbstract|VirtualInterface */
+            /* @var EntityAbstract|VirtualInterface $vEntity */
             $vExists = $vEntity->file_exists();
             $rDeleted = false;
 
@@ -522,7 +467,7 @@ class Partition
                 $rEntity = $rEntity->getRealEntity();
                 $rDeleted = $rDeleted || !$rEntity->file_exists();
             } while ($rEntity instanceof VirtualInterface);
-            /* @var $rEntity Entity */
+
             $rExists = $rEntity->file_exists();
             if ($rExists && !$vExists) {
                 $rDeleted = true;
@@ -538,7 +483,6 @@ class Partition
                     $this->copyChanges($filepath);
                 }
             } else {
-                /* @var $vEntity Virtual */
                 if ($vEntity->is_file()) {
                     unlink($rPath);
                     copy($vEntity->path(), $rPath);
@@ -548,7 +492,6 @@ class Partition
 
         $subtrees = $changes->sublists();
         foreach ($subtrees as $filename => $tree) {
-            /* @var $tree Changes */
             if (!isset($own[$filename])) {
                 $this->commitInternal($tree, $path.$filename);
             }
@@ -576,7 +519,6 @@ class Partition
 
             $list = $this->getList($path);
             foreach ($list as $file) {
-                /* @var $file EntityInterface */
                 $this->copyChanges($path.'/'.$file->basename());
             }
         }

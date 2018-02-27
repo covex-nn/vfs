@@ -1,32 +1,30 @@
 <?php
 
-/**
- * File/directory operations helper.
+declare(strict_types=1);
+
+/*
+ * (c) Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Covex\Stream;
 
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-
 /**
- * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * File/directory operations helper.
  */
 class Files
 {
     /**
      * @var string
      */
-    private $_systemTempDirectory = null;
+    private $systemTempDirectory = null;
 
     /**
      * @var int
      */
-    private $_tempnamCounter = 0;
+    private $tempnamCounter = 0;
 
     public function __destruct()
     {
@@ -38,10 +36,6 @@ class Files
 
     /**
      * Creates directory in sys_get_temp_dir().
-     *
-     * @param int $mode Mode
-     *
-     * @return string
      */
     public function mkdir(int $mode = 0777): string
     {
@@ -52,16 +46,14 @@ class Files
     }
 
     /**
-     * Return unique filename.
-     *
-     * @return string
+     * Get unique filename.
      */
     public function tempnam(): string
     {
         $sysTempDir = $this->sysGetTempDir();
         do {
-            ++$this->_tempnamCounter;
-            $name = $sysTempDir.'/'.$this->_tempnamCounter;
+            ++$this->tempnamCounter;
+            $name = $sysTempDir.'/'.$this->tempnamCounter;
         } while (file_exists($name));
 
         return $name;
@@ -69,8 +61,6 @@ class Files
 
     /**
      * Delete file or directory.
-     *
-     * @param string $path Path
      */
     public function delete($path): void
     {
@@ -79,12 +69,12 @@ class Files
         } elseif (is_file($path)) {
             unlink($path);
         } else {
-            $iteratorRd = new RecursiveDirectoryIterator($path);
-            $iteratorRi = new RecursiveIteratorIterator(
-                $iteratorRd, RecursiveIteratorIterator::CHILD_FIRST
+            $iteratorRd = new \RecursiveDirectoryIterator($path);
+            $iteratorRi = new \RecursiveIteratorIterator(
+                $iteratorRd, \RecursiveIteratorIterator::CHILD_FIRST
             );
             foreach ($iteratorRi as $file) {
-                /* @var $file \SplFileInfo */
+                /** @var \SplFileInfo $file */
                 $filename = $file->getPathname();
                 if ($file->isLink()) {
                     $this->deleteSymlink($filename);
@@ -102,8 +92,6 @@ class Files
 
     /**
      * Delete symlink.
-     *
-     * @param string $link Path to link
      */
     private function deleteSymlink($link): void
     {
@@ -130,15 +118,11 @@ class Files
     }
 
     /**
-     * Return path to own temp directory.
-     *
-     * @param bool $create Create new folder ?
-     *
-     * @return string
+     * Get path to own temp directory.
      */
     private function sysGetTempDir(bool $create = true): ?string
     {
-        if (null === $this->_systemTempDirectory && $create) {
+        if (null === $this->systemTempDirectory && $create) {
             $sysTmpDir = rtrim(sys_get_temp_dir(), '\\/');
 
             do {
@@ -146,9 +130,9 @@ class Files
             } while (file_exists($name));
 
             mkdir($name, 0777);
-            $this->_systemTempDirectory = $name;
+            $this->systemTempDirectory = $name;
         }
 
-        return $this->_systemTempDirectory;
+        return $this->systemTempDirectory;
     }
 }

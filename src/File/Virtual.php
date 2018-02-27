@@ -1,17 +1,18 @@
 <?php
 
-/**
- * Virtual stream entity.
+declare(strict_types=1);
+
+/*
+ * (c) Andrey F. Mindubaev <covex.mobile@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-declare(strict_types=1);
 
 namespace Covex\Stream\File;
 
 /**
- * @author Andrey F. Mindubaev <covex.mobile@gmail.com>
+ * Virtual stream entity.
  */
 class Virtual extends EntityAbstract implements VirtualInterface
 {
@@ -23,11 +24,7 @@ class Virtual extends EntityAbstract implements VirtualInterface
     /**
      * Create new virtual stream entity.
      *
-     * @param EntityInterface $entity Real stream entity
-     * @param string          $path   Tmp path
-     * @param string          $name   Optional basename
-     *
-     * @return static
+     * @return $this
      */
     public static function newInstance(EntityInterface $entity, string $path, string $name = null): self
     {
@@ -40,9 +37,6 @@ class Virtual extends EntityAbstract implements VirtualInterface
         return $instance;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRealEntity(): EntityInterface
     {
         return $this->realEntity;

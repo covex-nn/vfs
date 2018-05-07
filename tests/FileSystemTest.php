@@ -108,6 +108,16 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $this->unregisterFS('vfs-test');
     }
 
+    public function testMkdir(): void
+    {
+        $this->registerFS('vfs-test');
+
+        mkdir('vfs-test://dir1/dir2', 0777, true);
+        $this->assertDirectoryExists('vfs-test://dir1/dir2');
+
+        $this->unregisterFS('vfs-test');
+    }
+
     public function testUnlinkRmdir(): void
     {
         $this->registerFS('vfs-test');

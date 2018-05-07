@@ -231,6 +231,11 @@ class Partition
         $result = null;
 
         $entity = $this->getEntity($path);
+        if (null === $entity && $options & STREAM_MKDIR_RECURSIVE) {
+            $this->makeDirectory(dirname($path), $mode, $options);
+
+            $entity = $this->getEntity($path);
+        }
         if (null !== $entity) {
             if (!$entity->file_exists()) {
                 $dir = $this->tempnam();
@@ -242,7 +247,6 @@ class Partition
                 $changes->add($path, $result);
             }
         }
-        /* @todo STREAM_MKDIR_RECURSIVE support */
 
         if (null === $result && ($options & STREAM_REPORT_ERRORS)) {
             trigger_error(

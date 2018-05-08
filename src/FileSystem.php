@@ -284,6 +284,29 @@ final class FileSystem
     }
 
     /**
+     * Change stream metadata.
+     *
+     * @param mixed $value
+     *
+     * @see http://php.net/manual/ru/streamwrapper.stream-metadata.php
+     */
+    public function stream_metadata(string $url, int $option, $value): bool
+    {
+        $partition = self::getPartition($url);
+        $path = self::getRelativePath($url);
+
+        switch ($option) {
+            case STREAM_META_TOUCH:
+                $result = $partition->touch($path, $value[1] ?? null, $value[2] ?? null) ? true : false;
+                break;
+            default:
+                $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
      * Register stream wrapper.
      */
     public static function register(string $protocol, string $root = null, int $flags = 0): bool

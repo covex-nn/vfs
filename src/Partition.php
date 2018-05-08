@@ -224,6 +224,30 @@ class Partition
     }
 
     /**
+     * @param int|null $time  Not used
+     * @param int|null $atime Not used
+     */
+    public function touch(string $path, ?int $time = null, ?int $atime = null): ?EntityInterface
+    {
+        $entity = $this->getEntity($path);
+        if (null !== $entity) {
+            if ($entity->is_dir()) {
+                $entity = null;
+            } elseif (!$entity->file_exists()) {
+                $changes = $this->getChanges();
+
+                $tmpPath = $this->tempnam();
+                file_put_contents($tmpPath, '');
+
+                $entity = Virtual::newInstance($entity, $tmpPath, $entity->basename());
+                $changes->add($path, $entity);
+            }
+        }
+
+        return $entity;
+    }
+
+    /**
      * Create a directory.
      */
     public function makeDirectory($path, $mode, $options): ?EntityInterface

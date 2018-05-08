@@ -79,6 +79,18 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(in_array('vfs-test', stream_get_wrappers()));
     }
 
+    public function testTouch(): void
+    {
+        $this->registerFS('vfs-test');
+
+        $this->assertFileNotExists('vfs-test://qwerty');
+        touch('vfs-test://qwerty');
+        $this->assertFileExists('vfs-test://qwerty');
+        $this->assertEquals('', file_get_contents('vfs-test://qwerty'));
+
+        $this->unregisterFS('vfs-test');
+    }
+
     public function testFiles(): void
     {
         $this->registerFS('vfs-test');

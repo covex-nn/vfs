@@ -17,12 +17,15 @@ matrix:
     include:
         - php: 7.2
           env: TRAVIS_SCRIPT="lint"
+        - php: 7.2
+          env: TRAVIS_SCRIPT="bc-check"
         - php: 7.1
         - php: 7.2
           env: COVERAGE=true PHPUNIT_FLAGS="-v --coverage-clover build/logs/clover.xml"
         - php: nightly
     allow_failures:
         - php: nightly
+        - env: TRAVIS_SCRIPT="bc-check"
 
 before_install:
     - if [[ $COVERAGE != true ]]; then
@@ -46,7 +49,10 @@ install:
           wget "https://github.com/php-coveralls/php-coveralls/releases/download/v2.0.0/php-coveralls.phar" --output-document="${HOME}/bin/coveralls";
           chmod u+x "${HOME}/bin/coveralls";
       fi
-    - if [[ $TRAVIS_SCRIPT != "lint" ]]; then
+    - if [[ $TRAVIS_SCRIPT == 'bc-check' ]]; then
+          composer require roave/backward-compatibility-check --dev;
+      fi
+    - if [[ $TRAVIS_SCRIPT != 'lint' ]]; then
           composer install;
       fi
 
@@ -54,6 +60,9 @@ script:
     - if [[ $TRAVIS_SCRIPT == 'lint' ]]; then
           composer validate --strict --no-check-lock;
           php-cs-fixer fix --diff --dry-run -v;
+      fi
+    - if [[ $TRAVIS_SCRIPT == 'bc-check' ]]; then
+          vendor/bin/roave-backward-compatibility-check;
       fi
     - if [[ $TRAVIS_SCRIPT == 'phpunit' ]]; then
           phpunit $PHPUNIT_FLAGS;

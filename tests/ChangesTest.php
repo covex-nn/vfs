@@ -32,7 +32,7 @@ class ChangesTest extends TestCase
         $changes->add('qqq/www/eee', $entity);
 
         $sublists1 = $changes->sublists();
-        $this->assertEquals(1, count($sublists1['qqq']));
+        $this->assertCount(1, $sublists1['qqq']);
         $this->assertTrue(isset($sublists1['qqq']));
         $this->assertTrue($sublists1['qqq'] instanceof Changes);
 

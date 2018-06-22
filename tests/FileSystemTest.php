@@ -343,7 +343,7 @@ class FileSystemTest extends \PHPUnit\Framework\TestCase
         foreach ($iteratorRi as $file) {
             /* @var $file \SplFileInfo */
             $pathname = str_replace(
-                DIRECTORY_SEPARATOR, '/', $file->getPathname()
+                \DIRECTORY_SEPARATOR, '/', $file->getPathname()
             );
             $paths[] = $pathname;
         }
